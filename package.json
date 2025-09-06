@@ -1,0 +1,42 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "npx prisma generate && nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@mdi/font": "^7.4.47",
+    "@pinia/nuxt": "^0.11.2",
+    "@prisma/nuxt": "^0.3.0",
+    "bcrypt": "^6.0.0",
+    "cheerio": "^1.1.2",
+    "cookie": "^1.0.2",
+    "google-auth-library": "^10.2.1",
+    "js-cookie": "^3.0.5",
+    "jsonwebtoken": "^9.0.2",
+    "jwt-decode": "^4.0.0",
+    "nodemailer": "^7.0.6",
+    "nuxt": "^3.17.6",
+    "nuxt-vue3-google-signin": "^0.0.11",
+    "pinia": "^3.0.3",
+    "pinia-plugin-persistedstate": "^4.5.0",
+    "prisma": "^6.12.0",
+    "vue": "^3.5.17",
+    "vue-router": "^4.5.1",
+    "vue3-google-signin": "^2.1.1"
+  },
+  "devDependencies": {
+    "@nuxtjs/google-fonts": "^3.2.0",
+    "@types/bcrypt": "^6.0.0",
+    "@types/js-cookie": "^3.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/nodemailer": "^7.0.1",
+    "vite-plugin-vuetify": "^2.1.1",
+    "vuetify": "^3.8.12"
+  }
+}

@@ -1,0 +1,35 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("NUXT_API_DATABASE")
+}
+
+generator client {
+  provider             = "prisma-client-js"
+  recursive_type_depth = 5
+}
+
+model Product {
+  id          String   @id @default(dbgenerated())
+  name        String
+  slug        String
+  description String   @default("Không tìm thấy thông tin sản phẩm")
+  status      String
+  price       String
+  imageInfo   String[]
+  discount    String[]
+}
+
+model Users {
+  id          String   @id @default(dbgenerated())
+  name        String
+  email       String   @unique
+  password    String?
+  role        String
+  avata       String   @default("https://avatars0.githubusercontent.com/u/9064066?v=4&s=460")
+  phonenumber BigInt?  @unique
+  active      Boolean  @default(false)
+  status      Boolean  @default(true)
+  expiredDate DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
