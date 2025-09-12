@@ -78,6 +78,12 @@ export const useFruitStore = defineStore('websiteStore', {
         method: "POST",
         body: { token },
       })
+      if (response_status_verify) {
+        this.userinfo = response_status_verify
+        this.isLogin = true
+      } else {
+        this.isLogin = false
+      }
       return response_status_verify
     },
 
@@ -142,6 +148,21 @@ export const useFruitStore = defineStore('websiteStore', {
         body: { id }
       })
       return response_clear
+    },
+
+    async updateAvataUser(user_id: string, base64url: string) {
+      const config = useRuntimeConfig()
+      try {
+        const response_update_avata = await $fetch(`${config.public.NUXT_DOMAIN}/api/setting/update-avata`, {
+          method: "POST",
+          body: { user_id, base64url }
+        })
+          ; (this.userinfo as any).avata = response_update_avata
+          console.log(this.userinfo)
+        return true
+      } catch (error) {
+        return error
+      }
     },
 
   },

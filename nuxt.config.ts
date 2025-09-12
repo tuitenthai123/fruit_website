@@ -24,12 +24,15 @@ export default defineNuxtConfig({
       NUXT_SMTP_USER: process.env.NUXT_SMTP_USER,
       NUXT_SMTP_PASS: process.env.NUXT_SMTP_PASS,
       NUXT_FROM_EMAIL: process.env.NUXT_FROM_EMAIL,
+      NUXT_CLOUDINARY_CLOUD_NAME: process.env.NUXT_CLOUDINARY_CLOUD_NAME,
+      NUXT_CLOUDINARY_API_KEY: process.env.NUXT_CLOUDINARY_API_KEY,
+      NUXT_CLOUDINARY_API_SECRET: process.env.NUXT_CLOUDINARY_API_SECRET,
     },
     public: {
       NUXT_DOMAIN: process.env.NUXT_DOMAIN,
     }
   },
-  
+
   modules: [
     'nuxt-vue3-google-signin',
     '@pinia/nuxt',
@@ -76,4 +79,3 @@ export default defineNuxtConfig({
     }
   }
 })
-

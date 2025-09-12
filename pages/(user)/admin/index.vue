@@ -163,14 +163,8 @@
                           </v-chip>
                         </template>
                         <template v-else>
-                          <v-btn
-                            color="warning"
-                            size="x-small"
-                            variant="outlined"
-                            class="custom-btn px-2"
-                            prepend-icon="mdi-lock-alert"
-                            @click="openResetDialog(item.id)"
-                          >
+                          <v-btn color="warning" size="x-small" variant="outlined" class="custom-btn px-2"
+                            prepend-icon="mdi-lock-alert" @click="openResetDialog(item.id)">
                             <span class="text-caption">Thiết lập</span>
                           </v-btn>
                         </template>
@@ -320,6 +314,7 @@ const snackbar = ref({ show: false, message: '', color: 'success' })
 
 const items = [
   { title: 'Hồ sơ', action: () => console.log('go profile') },
+  { title: 'Trang chủ', action: () => router.push("/")},
   { title: 'Đăng xuất', action: async () => { try { await store.logOut(); await router.push('/') } catch (e) { console.error(e) } } }
 ]
 
@@ -620,7 +615,7 @@ const onSaveUser = async () => {
       name: currentUser.value.name,
       email: currentUser.value.email,
       phonenumber: Number(currentUser.value.phone) || null,
-      role: currentUser.value.role,                         
+      role: currentUser.value.role,
       active: currentUser.value.status === 'Hoạt động',
       status: currentUser.value.status === 'Hoạt động'
     }

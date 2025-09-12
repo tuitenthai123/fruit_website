@@ -3,6 +3,10 @@ import { db } from "~/lib/prisma"
 import jwt from "jsonwebtoken"
 import cookie from "cookie"
 
+(BigInt.prototype as any).toJSON = function () {
+  return this.toString()
+}
+
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const token = await readBody(event)
@@ -33,7 +37,9 @@ export default defineEventHandler(async (event) => {
       {
         id: email_exist.id,
         email: email_exist.email,
-        role: email_exist.role
+        role: email_exist.role,
+        name: email_exist.name,     // Thêm name
+        avata: email_exist.avata
       },
       secret,
       { expiresIn: "1h" }
@@ -55,9 +61,10 @@ export default defineEventHandler(async (event) => {
         role: "2",
         avata: `${payload?.picture}`,
         active: true,
-        status:true
+        status: true
       }
     })
+
     return { "user_id": user_id }
   }
 })

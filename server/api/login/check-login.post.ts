@@ -10,7 +10,6 @@ interface Userdata {
   };
 }
 
-// Helper convert BigInt => string
 function convertBigInt(obj: any) {
   return JSON.parse(
     JSON.stringify(obj, (key, value) =>
@@ -47,7 +46,9 @@ export default defineEventHandler(async (event) => {
     {
       id: user.id,
       email: user.email,
-      role: user.role
+      role: user.role,
+      name: user.name,     // Thêm name
+      avata: user.avata
     },
     secret,
     { expiresIn: "1h" }
@@ -60,7 +61,6 @@ export default defineEventHandler(async (event) => {
     maxAge: 60 * 60
   }))
 
-  // Loại bỏ password + convert BigInt
   const { password: _, ...safeUser } = user
   return convertBigInt(safeUser)
 })

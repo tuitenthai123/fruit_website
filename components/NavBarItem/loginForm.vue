@@ -16,7 +16,7 @@
           density="compact" prepend-inner-icon="mdi-lock-outline" class="mb-3" />
 
         <div class="d-flex justify-end align-end mb-4">
-          <a href="#" style="color: #f36f40; text-decoration: none; font-size: 14px;">
+          <a href="/forgotpass" style="color: #f36f40; text-decoration: none; font-size: 14px;">
             Quên mật khẩu?
           </a>
         </div>
