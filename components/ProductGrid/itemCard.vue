@@ -14,7 +14,7 @@
           <div class="info">
             <div class="title">{{ truncateWords(item.name, 5) }}</div>
             <div class="price">{{ item?.price }}</div>
-            <v-btn :color="item?.status === 'Còn hàng' ? '#f36f3f' : 'darkgray'" :disabled="item?.status !== 'Còn hàng'"
+            <v-btn @click="addProductToCart(item)" :color="item?.status === 'Còn hàng' ? '#f36f3f' : 'darkgray'" :disabled="item?.status !== 'Còn hàng'"
               small class="buy-btn">
               {{
                 item?.status === 'Còn hàng' ? `Mua ngay` : `${item?.status}`
@@ -29,6 +29,8 @@
 
 <script lang="ts" setup>
 import { truncateWords } from '~/lib/truncatewords'
+
+const store = useFruitStore()
 defineProps<{
   itemdata?: Array<{
     imageInfo: any,
@@ -42,6 +44,16 @@ defineProps<{
 const navigateProductinfo = (id:any) =>{
   const route = useRouter();
   route.push(`/products/${id}`)
+}
+
+const addProductToCart = (product: any) => {
+  store.cartproduct.push({
+    id: product?.id,
+    name: product?.name,
+    price:  product?.price,
+    imginfo: product?.imageInfo[1] ?? product?.imageInfo[0],
+    count_product:1,
+  })
 }
 </script>
 

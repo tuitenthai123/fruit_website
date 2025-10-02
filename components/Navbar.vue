@@ -44,10 +44,17 @@
               <div><v-icon size="25">mdi-phone-outline</v-icon></div>
               <div><span>Hotline: 0865660775</span></div>
             </button>
-            <button class="menu-col">
-              <div><v-icon size="25">mdi-cart-outline</v-icon></div>
-              <div><span>Giỏ hàng</span></div>
-            </button>
+
+            <v-menu :close-on-content-click="false">
+              <template v-slot:activator="{ props }">
+                <button class="menu-col" v-bind="props">
+                  <div><v-icon size="25">mdi-cart-outline</v-icon></div>
+                  <div><span>Giỏ hàng</span></div>
+                </button>
+              </template>
+              <CartProduct/>
+            </v-menu>
+
             <v-menu :close-on-content-click="false">
               <template v-slot:activator="{ props }">
                 <button v-if="!store.isLogin" class="menu-col" v-bind="props">
@@ -59,8 +66,8 @@
                 <button v-else v-bind="props" class="menu-col">
                   <v-avatar size="50">
                     <v-img crossorigin="anonymous" :src="avata?.includes('google')
-                          ? `/api/users/${avata.split('/').slice(-2).join('/')}`
-                          : avata" alt="User avatar" />
+                      ? `/api/users/${avata.split('/').slice(-2).join('/')}`
+                      : avata" alt="User avatar" />
                   </v-avatar>
                 </button>
               </template>
@@ -112,7 +119,7 @@ const avata = computed(() => {
 
 
 onMounted(() => {
-  
+
 })
 
 </script>
@@ -243,7 +250,7 @@ input::-webkit-input-placeholder {
     display: none;
   }
 
-  .item-navbar-center{
+  .item-navbar-center {
     display: none;
   }
 

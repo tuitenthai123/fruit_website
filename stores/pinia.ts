@@ -1,6 +1,15 @@
+export interface CartItem {
+  id: string
+  name: string
+  price: string
+  imginfo: string
+  count_product:number
+}
+
 export const useFruitStore = defineStore('websiteStore', {
   state: () => ({
     mainpagedata: [],
+    cartproduct: [] as CartItem[],
     productdata: [],
     productitemdata: {},
     userinfo: {},
@@ -12,33 +21,29 @@ export const useFruitStore = defineStore('websiteStore', {
   },
 
   actions: {
+    
     async fetchDataMainpage() {
-      const config = useRuntimeConfig()
-      const infos: any = await $fetch(`${config.public.NUXT_DOMAIN}/api/get-mainpage-data`)
+      const infos: any = await $fetch(`/api/get-mainpage-data`)
       this.mainpagedata = infos
     },
 
     async fetchDataUser() {
-      const config = useRuntimeConfig()
-      const infos_user: any = await $fetch(`${config.public.NUXT_DOMAIN}/api/users/get-all-user`)
+      const infos_user: any = await $fetch(`/api/users/get-all-user`)
       return infos_user
     },
 
     async fetchDataProduct(typeProduct: string) {
-      const config = useRuntimeConfig()
-      const productreponse: any = await $fetch(`${config.public.NUXT_DOMAIN}/api/get-data-product?type=${typeProduct}`)
+      const productreponse: any = await $fetch(`/api/get-data-product?type=${typeProduct}`)
       this.productdata = productreponse
     },
 
     async fetchDataItemProduct(idProduct: string) {
-      const config = useRuntimeConfig()
-      const productreponse: any = await $fetch(`${config.public.NUXT_DOMAIN}/api/get-products-item?id_product=${idProduct}`)
+      const productreponse: any = await $fetch(`/api/get-products-item?id_product=${idProduct}`)
       this.productitemdata = productreponse
     },
 
     async checkLoginData(user_data: string) {
-      const config = useRuntimeConfig()
-      const response_status_login: any = await $fetch(`${config.public.NUXT_DOMAIN}/api/login/check-login`, {
+      const response_status_login: any = await $fetch(`/api/login/check-login`, {
         method: "POST",
         body: {
           user_data
@@ -55,15 +60,13 @@ export const useFruitStore = defineStore('websiteStore', {
     },
 
     async logOut() {
-      const config = useRuntimeConfig()
-      await $fetch(`${config.public.NUXT_DOMAIN}/api/logout`)
+      await $fetch(`/api/logout`)
       this.isLogin = false
       this.userinfo = {}
     },
 
     async signUp(payload: Record<string, any>) {
-      const config = useRuntimeConfig()
-      const response_status_login: any = await $fetch(`${config.public.NUXT_DOMAIN}/api/sign-up`, {
+      const response_status_login: any = await $fetch(`/api/sign-up`, {
         method: "POST",
         body: {
           payload // luôn gửi dạng object
@@ -73,8 +76,7 @@ export const useFruitStore = defineStore('websiteStore', {
     },
 
     async verifyToken(token: string) {
-      const config = useRuntimeConfig()
-      const response_status_verify = await $fetch(`${config.public.NUXT_DOMAIN}/api/login/verify-token`, {
+      const response_status_verify = await $fetch(`/api/login/verify-token`, {
         method: "POST",
         body: { token },
       })
@@ -82,8 +84,7 @@ export const useFruitStore = defineStore('websiteStore', {
     },
 
     async confirmPassword(newpassword: string, user_id?: string) {
-      const config = useRuntimeConfig()
-      const response_status_verify = await $fetch(`${config.public.NUXT_DOMAIN}/api/login/confirm-password`, {
+      const response_status_verify = await $fetch(`/api/login/confirm-password`, {
         method: "POST",
         body: { newpassword, user_id }
       })
@@ -91,8 +92,7 @@ export const useFruitStore = defineStore('websiteStore', {
     },
 
     async checkUserId(user_id?: string) {
-      const config = useRuntimeConfig()
-      const response_status_checking = await $fetch(`${config.public.NUXT_DOMAIN}/api/users/checking-user-exist`, {
+      const response_status_checking = await $fetch(`/api/users/checking-user-exist`, {
         method: "POST",
         body: { user_id, type: "fisttime" }
       })
@@ -100,8 +100,7 @@ export const useFruitStore = defineStore('websiteStore', {
     },
 
     async addNewUser(payload: any) {
-      const config = useRuntimeConfig()
-      const response_status_verify = await $fetch(`${config.public.NUXT_DOMAIN}/api/users/add-new-user`, {
+      const response_status_verify = await $fetch(`/api/users/add-new-user`, {
         method: "POST",
         body: { payload }
       })
@@ -109,8 +108,7 @@ export const useFruitStore = defineStore('websiteStore', {
     },
 
     async updateUser(payload: any) {
-      const config = useRuntimeConfig()
-      const response_status_verify = await $fetch(`${config.public.NUXT_DOMAIN}/api/users/update-user`, {
+      const response_status_verify = await $fetch(`/api/users/update-user`, {
         method: "POST",
         body: { payload }
       })
@@ -118,8 +116,7 @@ export const useFruitStore = defineStore('websiteStore', {
     },
 
     async deleteUser(id: any) {
-      const config = useRuntimeConfig()
-      const response_status_verify = await $fetch(`${config.public.NUXT_DOMAIN}/api/users/delete-user`, {
+      const response_status_verify = await $fetch(`/api/users/delete-user`, {
         method: "POST",
         body: { id }
       })
@@ -127,8 +124,7 @@ export const useFruitStore = defineStore('websiteStore', {
     },
 
     async renewEmailPassword(email: string) {
-      const config = useRuntimeConfig()
-      const response_renew_status = await $fetch(`${config.public.NUXT_DOMAIN}/api/forgotpass/send-email-renew-pass`, {
+      const response_renew_status = await $fetch(`/api/forgotpass/send-email-renew-pass`, {
         method: "POST",
         body: { email }
       })
@@ -136,8 +132,7 @@ export const useFruitStore = defineStore('websiteStore', {
     },
 
     async clearExpiredDate(id: string) {
-      const config = useRuntimeConfig()
-      const response_clear = await $fetch(`${config.public.NUXT_DOMAIN}/api/forgotpass/clear-expired`, {
+      const response_clear = await $fetch(`/api/forgotpass/clear-expired`, {
         method: "POST",
         body: { id }
       })

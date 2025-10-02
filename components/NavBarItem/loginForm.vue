@@ -108,7 +108,7 @@ const handleLoginSuccess = async (response: CredentialResponse) => {
   const status_login_google = await store.verifyToken(`${credential}`)
   if ("user_id" in status_login_google) {
     router.push(`/login/${status_login_google.user_id}`)
-  } else if (status_login_google.password === null) {
+  } else if ("password" in status_login_google && status_login_google.password === null) {
     router.push(`/login/${status_login_google.id}`)
   } else {
     switchRouter(status_login_google.role)
