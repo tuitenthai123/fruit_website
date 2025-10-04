@@ -3,7 +3,7 @@ export interface CartItem {
   name: string
   price: string
   imginfo: string
-  count_product:number
+  count_product: number
 }
 
 export const useFruitStore = defineStore('websiteStore', {
@@ -21,7 +21,7 @@ export const useFruitStore = defineStore('websiteStore', {
   },
 
   actions: {
-    
+
     async fetchDataMainpage() {
       const infos: any = await $fetch(`/api/get-mainpage-data`)
       this.mainpagedata = infos
@@ -69,7 +69,7 @@ export const useFruitStore = defineStore('websiteStore', {
       const response_status_login: any = await $fetch(`/api/sign-up`, {
         method: "POST",
         body: {
-          payload // luôn gửi dạng object
+          payload
         }
       })
       return response_status_login
@@ -80,6 +80,10 @@ export const useFruitStore = defineStore('websiteStore', {
         method: "POST",
         body: { token },
       })
+      if (response_status_verify) {
+        this.userinfo = response_status_verify
+        this.isLogin = true
+      }
       return response_status_verify
     },
 
