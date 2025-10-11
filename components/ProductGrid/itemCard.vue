@@ -3,7 +3,8 @@
     <v-row align="center" justify="space-between">
       <v-col v-for="(item, index) in itemdata" :key="index" cols="12" sm="2" class="d-flex justify-center">
         <div class="item-catelory">
-          <div style="position: relative; display: inline-block; cursor: pointer;" @click="navigateProductinfo(item?.id)">
+          <div style="position: relative; display: inline-block; cursor: pointer;"
+            @click="navigateProductinfo(item?.id)">
             <div v-if="(item?.status) !== 'Còn hàng'"
               style="position: absolute; top: 5px; left: 5px; font-size: 11px; color: white; background-color: #565656; padding: 4px; z-index: 1;">
               {{ item?.status }}
@@ -14,8 +15,8 @@
           <div class="info">
             <div class="title">{{ truncateWords(item.name, 5) }}</div>
             <div class="price">{{ item?.price }}</div>
-            <v-btn @click="addProductToCart(item)" :color="item?.status === 'Còn hàng' ? '#f36f3f' : 'darkgray'" :disabled="item?.status !== 'Còn hàng'"
-              small class="buy-btn">
+            <v-btn @click="addProductToCart(item)" :color="item?.status === 'Còn hàng' ? '#f36f3f' : 'darkgray'"
+              :disabled="item?.status !== 'Còn hàng'" small class="buy-btn">
               {{
                 item?.status === 'Còn hàng' ? `Mua ngay` : `${item?.status}`
               }}
@@ -24,11 +25,35 @@
         </div>
       </v-col>
     </v-row>
+    <v-snackbar class="pa-1" v-model="snackbar" color="white" location="top right" :timeout="2000">
+
+      <div class="d-flex justify-space-between align-center mb-2">
+        <span style="color: #e53935; font-weight: 700;">Đã thêm vào giỏ hàng thành công!</span>
+        <v-btn icon small variant="text" @click="snackbar = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </div>
+      <div class="d-flex align-start" style="gap: 10px;">
+        <v-img :src="snackProduct?.imginfo" max-width="70" style="border: 1px solid #eee;" />
+        <div>
+          <div style="font-weight: 600; font-size: 14px;">
+            {{ snackProduct?.name }}
+          </div>
+          <div style="color: #f36f3f; font-weight: 600;">
+            {{ snackProduct?.price }}
+          </div>
+        </div>
+      </div>
+
+    </v-snackbar>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { truncateWords } from '~/lib/truncatewords'
+const snackbar = ref(false)
+const snackProduct = ref<any>(null)
+
 
 const store = useFruitStore()
 defineProps<{
@@ -37,23 +62,35 @@ defineProps<{
     name: any,
     price: any,
     status: any,
-    id:any,
+    id: any,
   }>
 }>()
 
-const navigateProductinfo = (id:any) =>{
+const navigateProductinfo = (id: any) => {
   const route = useRouter();
   route.push(`/products/${id}`)
 }
 
 const addProductToCart = (product: any) => {
-  store.cartproduct.push({
-    id: product?.id,
+  const exist = store.cartproduct.find((p) => p.id === product?.id)
+
+  if (exist) {
+    exist.count_product += 1
+  } else {
+    store.cartproduct.push({
+      id: product?.id,
+      name: product?.name,
+      price: product?.price,
+      imginfo: product?.imageInfo[1] ?? product?.imageInfo[0],
+      count_product: 1,
+    })
+  }
+  snackProduct.value = {
     name: product?.name,
-    price:  product?.price,
+    price: product?.price,
     imginfo: product?.imageInfo[1] ?? product?.imageInfo[0],
-    count_product:1,
-  })
+  }
+  snackbar.value = true
 }
 </script>
 

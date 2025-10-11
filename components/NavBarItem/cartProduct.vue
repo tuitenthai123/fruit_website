@@ -4,13 +4,11 @@
       <h3 class="text-center mb-3" style="color: #F36F3F;">GIỎ HÀNG</h3>
       <v-divider class="mb-3"></v-divider>
 
-      <!-- Nếu không có sản phẩm -->
       <div v-if="product.length === 0" class="text-center py-10">
         <v-icon size="40" color="orange-darken-1">mdi-cart-outline</v-icon>
         <p class="mt-2" style="color: gray;">Hiện chưa có sản phẩm</p>
       </div>
 
-      <!-- Nếu có sản phẩm -->
       <div v-else>
         <div v-for="(item, index) in product" :key="index" class="mb-5 product-item d-flex">
           <v-img :src="item.imginfo" alt="product" max-width="70" class="mr-3 rounded"></v-img>
@@ -48,7 +46,7 @@
           <span style="font-size: 18px; font-weight: 600;">Tổng tiền: </span>
           <span style="color: red; font-weight: 600; font-size: 18px;">{{ formatPrice(totalPrice) }}</span>
         </div>
-        <v-btn style="width: 100%;" color="#F36F3F">Chi tiết giỏ hàng</v-btn>
+        <v-btn style="width: 100%;" color="#F36F3F" @click="router.push('/cart')">Chi tiết giỏ hàng</v-btn>
       </div>
     </v-container>
   </v-card>
@@ -56,21 +54,19 @@
 
 <script setup lang="ts">
 const store = useFruitStore()
+const router = useRouter()
 const product = computed(() => store.cartproduct)
 
-// Chuyển "150000 đ" -> 150000 (number)
 const parsePrice = (priceStr: string): number => {
   if (!priceStr) return 0
   return Number(priceStr.replace(/[^\d]/g, "")) || 0
 }
 
-// Format số -> "150.000 đ"
 const formatPrice = (value: number) => {
   if (!value) return "0 đ"
   return value.toLocaleString("vi-VN") + " đ"
 }
 
-// Tổng tiền
 const totalPrice = computed(() => {
   return product.value.reduce((sum, item) => {
     return sum + parsePrice(item.price) * item.count_product

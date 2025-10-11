@@ -28,7 +28,7 @@
       </template>
 
       <template v-else>
-        <v-carousel class="carousel" show-arrows="hover" transition="fade" hide-delimiters cycle interval="2500">
+        <v-carousel class="carousel" show-arrows="hover" transition="fade" hide-delimiters cycle interval="2500" width="1139" height="460">
           <v-carousel-item v-for="(item, index) in carouselitem" :key="index" :src=item cover></v-carousel-item>
         </v-carousel>
         <ItemGrid title="Trái ngon mỗi ngày" :itemdata="otherProduct" slug="all-product" />
@@ -80,10 +80,10 @@ onMounted(() => {
 })
 
 const carouselitem = [
-  "//theme.hstatic.net/200000377165/1001286359/14/slide_1_img.jpg?v=244",
-  "//theme.hstatic.net/200000377165/1001286359/14/slide_2_img.jpg?v=244",
-  "//theme.hstatic.net/200000377165/1001286359/14/slide_3_img.jpg?v=244",
-  "//theme.hstatic.net/200000377165/1001286359/14/slide_4_img.jpg?v=244"
+  "//theme.hstatic.net/200000377165/1001286359/14/slide_1_img_2048x2048.jpg?v=334",
+  "//theme.hstatic.net/200000377165/1001286359/14/slide_2_img_2048x2048.jpg?v=334",
+  "//theme.hstatic.net/200000377165/1001286359/14/slide_3_img_2048x2048.jpg?v=334",
+  "//theme.hstatic.net/200000377165/1001286359/14/slide_4_img_2048x2048.jpg?v=334"
 ]
 
 </script>

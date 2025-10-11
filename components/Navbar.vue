@@ -48,12 +48,18 @@
             <v-menu :close-on-content-click="false">
               <template v-slot:activator="{ props }">
                 <button class="menu-col" v-bind="props">
-                  <div><v-icon size="25">mdi-cart-outline</v-icon></div>
+                  <div>
+                    <v-badge :content="totalCart" color="red" overlap v-if="totalCart > 0">
+                      <v-icon size="25">mdi-cart-outline</v-icon>
+                    </v-badge>
+                    <v-icon v-else size="25">mdi-cart-outline</v-icon>
+                  </div>
                   <div><span>Giỏ hàng</span></div>
                 </button>
               </template>
-              <CartProduct/>
+              <CartProduct />
             </v-menu>
+
 
             <v-menu :close-on-content-click="false">
               <template v-slot:activator="{ props }">
@@ -114,6 +120,11 @@ function navigateToPage(slug: string, index: number) {
 const avata = computed(() => {
   const src = store.isLogin ? (store.userinfo as any)?.avata : "UR"
   return src
+})
+
+
+const totalCart = computed(() => {
+  return store.cartproduct.reduce((sum: number, item: any) => sum + item.count_product, 0)
 })
 
 

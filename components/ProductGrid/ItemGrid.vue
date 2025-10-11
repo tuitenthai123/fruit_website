@@ -34,12 +34,32 @@
       </span>
     </div>
   </div>
+  <v-snackbar class="pa-1" v-model="snackbar" color="white" location="top right" :timeout="2000">
+    <div class="d-flex justify-space-between align-center mb-2">
+      <span style="color: #e53935; font-weight: 700;">Đã thêm vào giỏ hàng thành công!</span>
+      <v-btn icon small variant="text" @click="snackbar = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </div>
+    <div class="d-flex align-start" style="gap: 10px;">
+      <v-img :src="snackProduct?.imginfo" max-width="70" style="border: 1px solid #eee;" />
+      <div>
+        <div style="font-weight: 600; font-size: 14px;">
+          {{ snackProduct?.name }}
+        </div>
+        <div style="color: #f36f3f; font-weight: 600;">
+          {{ snackProduct?.price }}
+        </div>
+      </div>
+    </div>
+  </v-snackbar>
 </template>
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import { truncateWords } from '~/lib/truncatewords';
-
+const snackbar = ref(false)
+const snackProduct = ref<any>(null)
 const route = useRouter();
 const store = useFruitStore()
 
@@ -65,6 +85,12 @@ const addProductToCart = (product: any) => {
       count_product: 1,
     })
   }
+  snackProduct.value = {
+    name: product?.name,
+    price: product?.price,
+    imginfo: product?.imageInfo[1] ?? product?.imageInfo[0],
+  }
+  snackbar.value = true
 }
 
 
