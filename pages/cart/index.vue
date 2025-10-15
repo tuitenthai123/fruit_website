@@ -18,7 +18,7 @@
 
           <v-card v-for="(item, index) in cart" :key="index" class="pa-3 mb-3 d-flex align-center justify-space-between"
             outlined>
-            
+
             <div
               style="flex: 0 0 80px; position: relative; display: flex; align-items: center; justify-content: center;">
               <img :src="(item.imginfo).replace('_compact', '_medium')" width="80" height="80" />
