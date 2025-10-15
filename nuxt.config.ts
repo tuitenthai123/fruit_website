@@ -3,7 +3,7 @@ import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
-  css: ['~/assets/main.css'],
+  css: ['~/assets/global.css'],
   app: {
     head: {
       title: "Moring Fruit",

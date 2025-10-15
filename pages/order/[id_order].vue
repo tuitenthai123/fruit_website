@@ -1,18 +1,15 @@
 <template>
   <v-container class="py-10" style="max-width: 800px;">
 
-    <!-- Success icon -->
     <div class="text-center mb-4">
       <v-icon color="success" size="64">mdi-check-circle-outline</v-icon>
     </div>
 
-    <!-- Title -->
     <div class="text-center mb-8">
       <h2 class="text-h5 font-weight-medium mb-2">Thank you</h2>
       <p class="text-body-2 text-grey-darken-1">Your order has been received</p>
     </div>
 
-    <!-- Order details -->
     <v-card variant="outlined" class="mb-8 pa-6">
       <h3 class="text-subtitle-1 font-weight-medium mb-4">Order details</h3>
 
