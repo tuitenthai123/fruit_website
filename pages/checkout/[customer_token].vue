@@ -1,8 +1,14 @@
 <template>
+  
   <div class="checkout-wrapper">
+    <!-- Thêm nút back -->
+    <button class="btn-back" @click="$router.push('/cart')">
+      <span>←</span> Quay lại giỏ hàng
+    </button>
+    
     <div class="checkout-left">
+      
       <h2>Thông tin giao hàng</h2>
-
       <form @submit.prevent="onSubmit">
         <div class="form-row">
           <input v-model="form.fullname" type="text" placeholder="Họ và tên" required />
@@ -233,11 +239,9 @@ function onSubmit() {
     return alert('Vui lòng chọn quận/huyện và phường/xã.')
 
   const orderData = {
-    customerInfo: {
-      ...form.value,
-      district: districts.find(d => d.value === form.value.district)?.text || '',
-      ward: wardOptions.value.find(w => w.value === form.value.ward)?.text || ''
-    },
+    ...form.value,
+    district: districts.find(d => d.value === form.value.district)?.text || '',
+    ward: wardOptions.value.find(w => w.value === form.value.ward)?.text || '',
     products: product.value.map(item => ({
       name: item.name,
       price: item.price,
@@ -411,5 +415,33 @@ h3 {
   font-size: 16px;
   font-weight: bold;
   color: red;
+}
+
+.btn-back {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: none;
+  background: #E9F4FFFF;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.btn-back:hover {
+  background: #e5e5e5;
+  color: #333;
+}
+
+.btn-back span {
+  font-size: 18px;
+  line-height: 1;
 }
 </style>

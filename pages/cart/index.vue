@@ -92,7 +92,7 @@
           <span style="color: red; font-weight: 700;">{{ totalPrice }}₫</span>
         </div>
 
-        <v-btn block color="red" size="large" class="white--text mb-3">
+        <v-btn block color="red" size="large" class="white--text mb-3" @click="router.push('/checkout/abc')">
           THANH TOÁN
         </v-btn>
 
@@ -110,6 +110,7 @@
 
 <script lang="ts" setup>
 const store = useFruitStore()
+const router = useRouter()
 const loading = ref(true)
 
 const cart = computed(() => store.cartproduct)
