@@ -22,6 +22,16 @@ export const useFruitStore = defineStore('websiteStore', {
 
   actions: {
 
+    async checkrole(userid:string) {
+      const role: any = await $fetch(`/api/users/checkrole`, {
+        method: "POST",
+        body: {
+          userid
+        },
+      })
+      return role
+    },
+
     async fetchDataMainpage() {
       const infos: any = await $fetch(`/api/get-mainpage-data`)
       this.mainpagedata = infos

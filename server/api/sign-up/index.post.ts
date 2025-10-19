@@ -18,7 +18,6 @@ if (!response_data?.payload) return false
 
   const user_Data = response_data.payload
 
-  // ✅ Check phone tồn tại (convert sang BigInt để so sánh với DB)
   if (user_Data.phone) {
     const check_phone_exist = await db.users.findUnique({
       where: {
@@ -28,7 +27,6 @@ if (!response_data?.payload) return false
     if (check_phone_exist) return "phone_exist"
   }
 
-  // ✅ Check email tồn tại
   const check_email_exist = await db.users.findUnique({
     where: {
       email: user_Data.email,
@@ -36,20 +34,26 @@ if (!response_data?.payload) return false
   })
   if (check_email_exist) return "email_exist"
 
-  // ✅ Hash password
   const password_hash = await bcrypt.hash(`${user_Data.password}`, 10)
-
-  // ✅ Insert user
+  const user_id = `user_${generateRandomId(5)}`
   await db.users.create({
     data: {
-      id: `user_${generateRandomId(5)}`,
+      id: user_id,
       name: `${user_Data.hoVaTenDem ?? ""} ${user_Data.ten ?? ""}`.trim(),
       email: user_Data.email!,
       password: password_hash,
-      phonenumber: BigInt(user_Data.phone!), // giữ BigInt
+      phonenumber: BigInt(user_Data.phone!),
       role: "2",
       status: true,
     },
+  })
+
+  await db.customer.create({
+    data:{
+      id:generateRandomId(5),
+      id_user:user_id,
+      shippingtime:"00:00 - 00:00"
+    }
   })
 
   return true

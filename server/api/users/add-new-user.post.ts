@@ -1,4 +1,5 @@
 import { db } from "~/lib/prisma"
+import generateRandomId from "~/lib/randomID"
 
 export default defineEventHandler(async (event) => {
   const { payload } = await readBody(event)
@@ -14,6 +15,13 @@ export default defineEventHandler(async (event) => {
         active: payload?.active,
       },
     })
+      await db.customer.create({
+        data:{
+          id:generateRandomId(5),
+          id_user:payload?.id,
+          shippingtime:"00:00 - 00:00"
+        }
+      })
 
     return JSON.parse(
       JSON.stringify(status_add_new_user, (_, value) =>

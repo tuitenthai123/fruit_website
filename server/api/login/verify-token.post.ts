@@ -2,6 +2,7 @@ import { OAuth2Client } from "google-auth-library"
 import { db } from "~/lib/prisma"
 import jwt from "jsonwebtoken"
 import cookie from "cookie"
+import generateRandomId from "~/lib/randomID"
 
 (BigInt.prototype as any).toJSON = function () {
   return this.toString()
@@ -51,7 +52,7 @@ export default defineEventHandler(async (event) => {
       maxAge: 60 * 60
     }))
 
-    const {password,...safeinfo} = email_exist
+    const { password, ...safeinfo } = email_exist
     return safeinfo
   } else {
     const user_id = `user_${String(payload?.exp).split('').reverse().join('').slice(0, 5)}`
@@ -64,6 +65,13 @@ export default defineEventHandler(async (event) => {
         avata: `${payload?.picture}`,
         active: true,
         status: true
+      }
+    })
+    await db.customer.create({
+      data: {
+        id: generateRandomId(5),
+        id_user: user_id,
+        shippingtime: "00:00 - 00:00"
       }
     })
 

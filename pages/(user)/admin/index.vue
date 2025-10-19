@@ -287,11 +287,6 @@
 import { ref, computed, onMounted } from 'vue'
 import generateRandomId from '~/lib/randomID'
 
-
-/* ---------- CONFIG: đổi nếu API base khác ---------- */
-const API_BASE = '' // nếu server path khác, set ở đây, ex: '/api' hoặc runtime config
-
-/* ---------- state ---------- */
 const store = useFruitStore()
 const config = useRuntimeConfig()
 const router = useRouter()
@@ -312,9 +307,6 @@ const roleFilter = ref('all')
 const userToDelete = ref(null)
 const passwordDialog = ref(false)
 const selectedPassword = ref('')
-
-
-
 
 const snackbar = ref({ show: false, message: '', color: 'success' })
 
@@ -340,9 +332,7 @@ const stats = ref([
 ])
 
 
-const users = ref([]) // 
-
-/* current user for add/edit */
+const users = ref([]) 
 const currentUser = ref({ id: ``, name: '', email: '', phonenumber: '', role: '2', status: true, department: '', active: false })
 
 const headers = ref([
@@ -365,7 +355,6 @@ const roleFilterOptions = ref([
   { label: 'User', value: '2' }
 ])
 
-// cho form (không có "Tất cả")
 const statusOptions = ref(['Hoạt động', 'Tạm khóa'])
 const roleOptions = ref([
   { label: 'Admin', value: '0' },
@@ -381,12 +370,10 @@ const phoneRules = ref([v => !v || /^[0-9]{9,11}$/.test(v) || 'Số điện tho�
 const filteredUsers = computed(() => {
   let filtered = [...(users.value || [])]
 
-  // Lọc theo trạng thái
   if (statusFilter.value !== 'Tất cả') {
     filtered = filtered.filter(user => getStatusLabel(user.status) === statusFilter.value)
   }
 
-  // Lọc theo vai trò
   if (roleFilter.value !== 'all') {
     filtered = filtered.filter(user => String(user.role) === roleFilter.value)
   }
@@ -451,7 +438,6 @@ const openResetDialog = (userId) => {
   resetDialog.value = { show: true, url }
 }
 
-// copy từ dialog
 const copyResetUrl = async () => {
   try {
     if (!resetDialog.value.url) throw new Error('No URL')
@@ -462,9 +448,6 @@ const copyResetUrl = async () => {
     showSnackbar('Copy thất bại', 'error')
   }
 }
-
-/* ---------- 3 ARROW FUNCTIONS: CRUD (gọi API) ---------- */
-/* ADD */
 
 const addUser = async (payload) => {
   try {
@@ -511,10 +494,7 @@ const removeUser = async (id) => {
   }
 }
 
-/* ---------- 3 ARROW FUNCTIONS: THỐNG KÊ (pure, không gọi API) ---------- */
-/* Strict: dùng active boolean để quyết định active/locked */
 
-/* 1) Tổng quan */
 
 const showPasswordDialog = (password) => {
   selectedPassword.value = password
@@ -585,9 +565,8 @@ const openAddDialog = () => {
     name: '',
     email: '',
     phone: '',
-    // mặc định
-    role: '2',               // User
-    status: 'Hoạt động'      // Active
+    role: '2',              
+    status: 'Hoạt động'      
   }
   userDialog.value = true
 }
@@ -597,7 +576,7 @@ const editUser = (user) => {
   currentUser.value = {
     ...user,
     phone: user.phonenumber ?? '',
-    role: String(user.role),                        // <-- ép về '0' | '1' | '2'
+    role: String(user.role),                      
     status: user.status === true ? 'Hoạt động' : 'Tạm khóa'
   }
   console.log(currentUser.value)
@@ -660,7 +639,6 @@ const onDeleteUser = async () => {
   }
 }
 
-/* ---------- misc helpers ---------- */
 const clearFilters = () => {
   search.value = ''
   statusFilter.value = 'Tất cả'
@@ -671,7 +649,6 @@ const showSnackbar = (message, color = 'success') => {
   snackbar.value = { show: true, message, color }
 }
 
-/* ---------- initial load: gọi store.fetchDataUser() như bạn có sẵn ---------- */
 const fetchInfoUser = async () => {
   return await store.fetchDataUser()
 }
@@ -682,7 +659,7 @@ onMounted(async () => {
     const arr = Array.isArray(res) ? res : (res?.data ?? [])
     users.value = arr.map(u => ({
       ...u,
-      verifyemail: u.verifyemail ?? (u.active === true),  // hoặc check field thật từ API
+      verifyemail: u.verifyemail ?? (u.active === true), 
       showPassword: false
     }))
     computeAndSetStats(users.value)
@@ -694,8 +671,10 @@ onMounted(async () => {
   }
 })
 
-/* expose for template */
 const statsCards = computed(() => stats.value)
+definePageMeta({
+  middleware: ["navigate-user-dashboard-client"]
+})
 
 </script>
 

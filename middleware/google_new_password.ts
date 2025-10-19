@@ -7,12 +7,10 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         return navigateTo("/login")
     }
 
-    // Case 1: Nếu password là null và không có expiredDate -> cho phép reset
     if (check_user_exist.password === null && !check_user_exist.expiredDate) {
         return 
     }
 
-    // Case 2: Kiểm tra expired date nếu có
     if (check_user_exist?.expiredDate) {
         const currentTime = new Date().getTime()
         const expiredTime = new Date(check_user_exist.expiredDate).getTime()
