@@ -163,14 +163,8 @@
                           </v-chip>
                         </template>
                         <template v-else>
-                          <v-btn
-                            color="warning"
-                            size="x-small"
-                            variant="outlined"
-                            class="custom-btn px-2"
-                            prepend-icon="mdi-lock-alert"
-                            @click="openResetDialog(item.id)"
-                          >
+                          <v-btn color="warning" size="x-small" variant="outlined" class="custom-btn px-2"
+                            prepend-icon="mdi-lock-alert" @click="openResetDialog(item.id)">
                             <span class="text-caption">Thiết lập</span>
                           </v-btn>
                         </template>
@@ -311,7 +305,8 @@ const selectedPassword = ref('')
 const snackbar = ref({ show: false, message: '', color: 'success' })
 
 const items = [
-  { title: 'Hồ sơ', action: () => console.log('go profile') },
+  { title: 'Trang chủ', action: async () => await router.push("/") },
+  { title: 'Hồ sơ', action: async () => await router.push("/setting") },
   { title: 'Đăng xuất', action: async () => { try { await store.logOut(); await router.push('/') } catch (e) { console.error(e) } } }
 ]
 
@@ -332,7 +327,7 @@ const stats = ref([
 ])
 
 
-const users = ref([]) 
+const users = ref([])
 const currentUser = ref({ id: ``, name: '', email: '', phonenumber: '', role: '2', status: true, department: '', active: false })
 
 const headers = ref([
@@ -565,8 +560,8 @@ const openAddDialog = () => {
     name: '',
     email: '',
     phone: '',
-    role: '2',              
-    status: 'Hoạt động'      
+    role: '2',
+    status: 'Hoạt động'
   }
   userDialog.value = true
 }
@@ -576,7 +571,7 @@ const editUser = (user) => {
   currentUser.value = {
     ...user,
     phone: user.phonenumber ?? '',
-    role: String(user.role),                      
+    role: String(user.role),
     status: user.status === true ? 'Hoạt động' : 'Tạm khóa'
   }
   console.log(currentUser.value)
@@ -599,7 +594,7 @@ const onSaveUser = async () => {
       name: currentUser.value.name,
       email: currentUser.value.email,
       phonenumber: Number(currentUser.value.phone) || null,
-      role: currentUser.value.role,                         
+      role: currentUser.value.role,
       active: currentUser.value.status === 'Hoạt động',
       status: currentUser.value.status === 'Hoạt động'
     }
@@ -659,7 +654,7 @@ onMounted(async () => {
     const arr = Array.isArray(res) ? res : (res?.data ?? [])
     users.value = arr.map(u => ({
       ...u,
-      verifyemail: u.verifyemail ?? (u.active === true), 
+      verifyemail: u.verifyemail ?? (u.active === true),
       showPassword: false
     }))
     computeAndSetStats(users.value)

@@ -34,25 +34,42 @@
       </span>
     </div>
   </div>
-  <v-snackbar class="pa-1" v-model="snackbar" color="white" location="top right" :timeout="2000">
+  <v-snackbar class="pa-1" v-model="snackbar" color="white" location="top end" :timeout="2000">
     <div class="d-flex justify-space-between align-center mb-2">
       <span style="color: #e53935; font-weight: 700;">Đã thêm vào giỏ hàng thành công!</span>
       <v-btn icon small variant="text" @click="snackbar = false">
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </div>
-    <div class="d-flex align-start" style="gap: 10px;">
-      <v-img :src="snackProduct?.imginfo" max-width="70" style="border: 1px solid #eee;" />
-      <div>
-        <div style="font-weight: 600; font-size: 14px;">
+
+    <div class="d-flex align-start" style="gap: 10px; align-items: flex-start; overflow: hidden;">
+      <v-img :src="snackProduct?.imginfo" max-width="70" min-width="70" height="70" cover
+        style="border: 1px solid #eee; border-radius: 6px; flex-shrink: 0;" />
+
+      <div style="
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        word-wrap: break-word;
+        white-space: normal;
+      ">
+        <div style="
+          font-weight: 600;
+          font-size: 14px;
+          color: #333;
+          line-height: 1.3;
+          word-break: break-word;
+        ">
           {{ snackProduct?.name }}
         </div>
-        <div style="color: #f36f3f; font-weight: 600;">
+
+        <div style="color: #f36f3f; font-weight: 700; margin-top: 4px;">
           {{ snackProduct?.price }}
         </div>
       </div>
     </div>
   </v-snackbar>
+
 </template>
 
 <script setup lang="ts">
@@ -72,19 +89,7 @@ const navigateProductinfo = (id: any) => {
 }
 
 const addProductToCart = (product: any) => {
-  const exist = store.cartproduct.find((p) => p.id === product?.id)
-
-  if (exist) {
-    exist.count_product += 1
-  } else {
-    store.cartproduct.push({
-      id: product?.id,
-      name: product?.name,
-      price: product?.price,
-      imginfo: product?.imageInfo[1] ?? product?.imageInfo[0],
-      count_product: 1,
-    })
-  }
+  store.addProductToCart(product)
   snackProduct.value = {
     name: product?.name,
     price: product?.price,

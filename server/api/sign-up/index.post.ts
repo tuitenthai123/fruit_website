@@ -52,7 +52,8 @@ if (!response_data?.payload) return false
     data:{
       id:generateRandomId(5),
       id_user:user_id,
-      shippingtime:"00:00 - 00:00"
+      shippingtime:"00:00 - 00:00",
+      productcart: [],
     }
   })
 

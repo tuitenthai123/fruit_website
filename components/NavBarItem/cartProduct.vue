@@ -10,43 +10,61 @@
       </div>
 
       <div v-else>
-        <div v-for="(item, index) in product" :key="index" class="mb-5 product-item d-flex">
-          <v-img :src="item.imginfo" alt="product" max-width="70" class="mr-3 rounded"></v-img>
+        <div v-for="(item, index) in product" :key="index" class="mb-5 product-item">
+          <v-img :src="item.imginfo" alt="product" max-width="70" class="mr-3 rounded" />
 
           <div class="product-info">
-            <div>
+            <div class="product-info-left">
               <div class="name-product">{{ item.name }}</div>
-              <div>
-                <div class="quantity-wrapper d-flex align-center">
-                  <v-btn @click="handleChangeCountProduct(index, 0)" :disabled="item.count_product <= 1" icon size="small"
-                    variant="outlined" class="quantity-btn quantity-btn-left" color="orange-darken-1">
-                    <v-icon size="18">mdi-minus</v-icon>
-                  </v-btn>
 
-                  <input v-model.number="item.count_product" type="number" min="1" class="quantity-input" />
+              <div class="quantity-wrapper d-flex align-center">
+                <v-btn
+                  @click="handleChangeCountProduct(index, 0)"
+                  :disabled="item.count_product <= 1"
+                  icon size="small"
+                  variant="outlined"
+                  class="quantity-btn quantity-btn-left"
+                  color="orange-darken-1"
+                >
+                  <v-icon size="18">mdi-minus</v-icon>
+                </v-btn>
 
-                  <v-btn @click="handleChangeCountProduct(index, 1)" icon size="small" variant="outlined"
-                    class="quantity-btn quantity-btn-right" color="orange-darken-1">
-                    <v-icon size="18">mdi-plus</v-icon>
-                  </v-btn>
-                </div>
+                <input
+                  v-model.number="item.count_product"
+                  type="number"
+                  min="1"
+                  class="quantity-input"
+                />
+
+                <v-btn
+                  @click="handleChangeCountProduct(index, 1)"
+                  icon size="small"
+                  variant="outlined"
+                  class="quantity-btn quantity-btn-right"
+                  color="orange-darken-1"
+                >
+                  <v-icon size="18">mdi-plus</v-icon>
+                </v-btn>
               </div>
             </div>
 
-            <div style="text-align: end;">
-              <button @click="clearProduct(item.id)">
+            <div class="product-info-right">
+              <button @click="clearProduct(item.id)" class="delete-btn">
                 <v-icon size="small">mdi-trash-can-outline</v-icon>
-              </button><br>
-              <span class="name-product">{{ formatPrice(parsePrice(item.price) * item.count_product) }}</span>
+              </button>
+              <span class="price">{{ formatPrice(parsePrice(item.price) * item.count_product) }}</span>
             </div>
           </div>
         </div>
 
-        <div class="d-flex justify-space-between pb-3">
-          <span style="font-size: 18px; font-weight: 600;">Tổng tiền: </span>
-          <span style="color: red; font-weight: 600; font-size: 18px;">{{ formatPrice(totalPrice) }}</span>
+        <div class="d-flex justify-space-between pb-3 total-line">
+          <span>Tổng tiền:</span>
+          <span>{{ formatPrice(totalPrice) }}</span>
         </div>
-        <v-btn style="width: 100%;" color="#F36F3F" @click="router.push('/cart')">Chi tiết giỏ hàng</v-btn>
+
+        <v-btn style="width: 100%;" color="#F36F3F" @click="router.push('/cart')">
+          Chi tiết giỏ hàng
+        </v-btn>
       </div>
     </v-container>
   </v-card>
@@ -86,26 +104,60 @@ const clearProduct = (id: string) => {
 }
 </script>
 
-<style>
+<style scoped>
 .product-item {
+  display: flex;
+  align-items: center;
   border-bottom: 1px solid #E3E3E3FF;
-  padding: 2px 2px 20px 2px;
+  padding: 10px 2px 20px 2px;
 }
 
 .product-item:last-of-type {
-  border: 0px;
-  padding: 2px;
+  border: 0;
+  padding-bottom: 0;
 }
 
 .product-info {
   display: flex;
   justify-content: space-between;
-  flex: 1
+  align-items: center;
+  flex: 1;
+}
+
+.product-info-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.product-info-right {
+  text-align: right;
+  min-width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .name-product {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
+  word-wrap: break-word;
+  margin-bottom: 6px;
+}
+
+.price {
+  font-size: 13px;
+  font-weight: 700;
+  color: #f44336;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 5px;
 }
 
 .quantity-wrapper {
@@ -148,5 +200,15 @@ const clearProduct = (id: string) => {
   align-items: center !important;
   justify-content: center !important;
   height: 100% !important;
+}
+
+.total-line {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.total-line span:last-child {
+  color: red;
 }
 </style>

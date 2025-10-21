@@ -38,7 +38,7 @@ model Users {
 model Customer {
   id          String   @id @default(dbgenerated())
   id_user     String
-  productcart String[]
+  productcart Json?
   address     String?
   customernote String?
   shippingtime String?

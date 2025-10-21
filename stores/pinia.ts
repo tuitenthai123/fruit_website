@@ -6,6 +6,7 @@ export interface CartItem {
   count_product: number
 }
 
+
 export const useFruitStore = defineStore('websiteStore', {
   state: () => ({
     mainpagedata: [],
@@ -22,7 +23,34 @@ export const useFruitStore = defineStore('websiteStore', {
 
   actions: {
 
-    async checkrole(userid:string) {
+    async addProductToCart(product: CartItem) {
+      
+      const exist = this.cartproduct.find((p) => p.id === product?.id)
+      let product_fix = { ...product, imginfo: (product as any)?.imageInfo[1] ?? (product as any)?.imageInfo[0] }
+      console.log(product_fix);
+
+      if (exist) {
+        exist.count_product += 1
+      } else {
+        this.cartproduct.push({
+          id: product_fix?.id,
+          name: product_fix?.name,
+          price: product_fix?.price,
+          imginfo: (product_fix as any)?.imginfo,
+          count_product: 1,
+        })
+        const response_update_cart: any = await $fetch(`/api/product/add_product`, {
+          method: "POST",
+          body: {
+            user_id: (this.userinfo as any)?.id,
+            cartproduct: this.cartproduct
+          },
+        })
+        console.log(response_update_cart);
+      }
+    },
+
+    async checkrole(userid: string) {
       const role: any = await $fetch(`/api/users/checkrole`, {
         method: "POST",
         body: {
