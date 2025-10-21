@@ -22,33 +22,42 @@ export const useFruitStore = defineStore('websiteStore', {
   },
 
   actions: {
+    async addProductToCart(product: CartItem, changecount?: number) {
+      const exist = this.cartproduct.find((p) => p.id === product.id)
 
-    async addProductToCart(product: CartItem) {
-      
-      const exist = this.cartproduct.find((p) => p.id === product?.id)
-      let product_fix = { ...product, imginfo: (product as any)?.imageInfo[1] ?? (product as any)?.imageInfo[0] }
-      console.log(product_fix);
+      const img = (product as any)?.imageInfo?.[1] ?? (product as any)?.imageInfo?.[0] ?? product.imginfo
+      const product_fix: CartItem = { ...product, imginfo: img }
 
       if (exist) {
-        exist.count_product += 1
+        if (changecount !== undefined) {
+          exist.count_product = changecount
+        } else {
+          exist.count_product += 1
+        }
       } else {
         this.cartproduct.push({
-          id: product_fix?.id,
-          name: product_fix?.name,
-          price: product_fix?.price,
-          imginfo: (product_fix as any)?.imginfo,
-          count_product: 1,
+          id: product_fix.id,
+          name: product_fix.name,
+          price: product_fix.price,
+          imginfo: product_fix.imginfo,
+          count_product: changecount ?? 1,
         })
-        const response_update_cart: any = await $fetch(`/api/product/add_product`, {
+      }
+
+      try {
+        const response = await $fetch(`/api/product/add_product`, {
           method: "POST",
           body: {
             user_id: (this.userinfo as any)?.id,
-            cartproduct: this.cartproduct
+            cartproduct: this.cartproduct,
           },
         })
-        console.log(response_update_cart);
+        console.log("✅ Updated cart:", response)
+      } catch (err) {
+        console.error("❌ Failed to update cart:", err)
       }
     },
+
 
     async checkrole(userid: string) {
       const role: any = await $fetch(`/api/users/checkrole`, {
@@ -88,9 +97,12 @@ export const useFruitStore = defineStore('websiteStore', {
         },
         credentials: "include"
       })
+
       if (response_status_login) {
         this.userinfo = response_status_login
         this.isLogin = true
+        const response_cart_product: any = await $fetch(`/api/product/load-data-cart?user_id=${response_status_login?.id}`)
+        this.cartproduct = response_cart_product
       } else {
         this.isLogin = false
       }
@@ -101,6 +113,7 @@ export const useFruitStore = defineStore('websiteStore', {
       await $fetch(`/api/logout`)
       this.isLogin = false
       this.userinfo = {}
+      this.cartproduct = []
     },
 
     async signUp(payload: Record<string, any>) {
@@ -121,6 +134,9 @@ export const useFruitStore = defineStore('websiteStore', {
       if (response_status_verify) {
         this.userinfo = response_status_verify
         this.isLogin = true
+        const response_cart_product: any = await $fetch(`/api/product/load-data-cart?user_id=${(response_status_verify as any)?.id}`)
+        console.log(response_cart_product);
+        this.cartproduct = response_cart_product
       }
       return response_status_verify
     },

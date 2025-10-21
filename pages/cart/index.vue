@@ -135,12 +135,19 @@ const totalPrice = computed(() => {
 })
 
 const handleChangeCountProduct = (index: number, typechange: number) => {
-  if (typechange === 0 && cart.value[index].count_product > 1) {
-    cart.value[index].count_product--
+  const product = cart.value[index]
+
+  if (typechange === 0 && product.count_product > 1) {
+    product.count_product--
   } else if (typechange === 1) {
-    cart.value[index].count_product++
+    product.count_product++
   }
+
+  console.log("conmeo");
+
+  store.addProductToCart(product, product.count_product)
 }
+
 
 const clearProduct = (id: string) => {
   store.cartproduct = store.cartproduct.filter(item => item.id !== id)
