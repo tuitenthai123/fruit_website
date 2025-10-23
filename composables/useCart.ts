@@ -13,7 +13,7 @@ export const useCart = () => {
         throw new Error('Thông tin sản phẩm không hợp lệ')
       }
 
-      await store.addProductToCart(product)
+      await store.updateProductToCart(product)
       return {
         success: true,
         message: 'Thêm vào giỏ hàng thành công'

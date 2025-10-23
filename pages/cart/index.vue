@@ -64,10 +64,9 @@
               Lưu ý: Khách hàng đặt quà tặng trái cây, vui lòng ghi rõ thông tin
               của người được tặng và người đặt để Morning Fruit thuận tiện liên hệ.
             </p>
-            <v-textarea placeholder="Nhập ghi chú..." variant="outlined" hide-details />
+            <v-textarea placeholder="Nhập ghi chú..." variant="outlined" hide-details
+              v-model="(store.customer_info).customernote" />
           </v-card>
-
-          <v-checkbox label="Xuất hoá đơn cho đơn hàng" color="orange" hide-details />
         </div>
       </v-col>
 
@@ -82,8 +81,7 @@
           <div v-if="deliveryOption === 'time'" class="mt-3">
             <div class="d-flex mb-3" style="gap: 16px;"> <v-select v-model="selectedDate" :items="dateOptions"
                 label="Ngày giao" variant="outlined" hide-details></v-select> <v-select v-model="selectedTime"
-                :items="timeOptions" label="Thời gian giao" variant="outlined" hide-details></v-select> </div> <v-btn
-              block color="orange" variant="outlined" @click="confirmDeliveryTime"> XÁC NHẬN THỜI GIAN </v-btn>
+                :items="timeOptions" label="Thời gian giao" variant="outlined" hide-details></v-select> </div>
           </div>
         </v-card>
 
@@ -92,7 +90,7 @@
           <span style="color: red; font-weight: 700;">{{ totalPrice }}₫</span>
         </div>
 
-        <v-btn block color="red" size="large" class="white--text mb-3" @click="router.push('/checkout/abc')">
+        <v-btn block color="red" size="large" class="white--text mb-3" @click="goToCheckout()">
           THANH TOÁN
         </v-btn>
 
@@ -112,26 +110,47 @@
 const store = useFruitStore()
 const router = useRouter()
 const loading = ref(true)
-
 const cart = computed(() => store.cartproduct)
 
 const deliveryOption = ref("now")
 const selectedDate = ref("Hôm nay")
 const selectedTime = ref("08:00 - 10:00")
 
+const deliveryInfo = computed(() => {
+  if (deliveryOption.value === "time") {
+    return `${selectedDate.value} - ${selectedTime.value}`
+  } else {
+    return "giaokhicohang"
+  }
+})
+
 const dateOptions = ["Hôm nay", "Ngày mai", "Ngày kia"]
-const timeOptions = ["08:00 - 10:00", "10:00 - 12:00", "14:00 - 16:00", "16:00 - 18:00",]
-const confirmDeliveryTime = () => {
-  console.log("Ngày giao:", selectedDate.value)
-  console.log("Thời gian giao:", selectedTime.value)
-  alert(`Đã chọn: ${selectedDate.value}, ${selectedTime.value}`)
+const timeOptions = [
+  "08:00 - 10:00",
+  "10:00 - 12:00",
+  "14:00 - 16:00",
+  "16:00 - 18:00",
+]
+
+const goToCheckout = () => {
+  console.log("Thông tin giao hàng:", deliveryInfo.value)
+  const customer_info = {
+    shippingtime: deliveryInfo.value,
+    customernote: store?.customer_info?.customernote,
+    id: store?.customer_info?.id,
+  }
+  store.updateCustomerInfo(customer_info)
+  router.push(`/checkout/${store?.customer_info?.id}`)
 }
+
 const totalPrice = computed(() => {
-  return cart.value.reduce(
-    (sum, item) =>
-      sum + parseInt(item.price.replace(/[.,₫]/g, "")) * item.count_product,
-    0
-  ).toLocaleString("vi-VN")
+  return cart.value
+    .reduce(
+      (sum, item) =>
+        sum + parseInt(item.price.replace(/[.,₫]/g, "")) * item.count_product,
+      0
+    )
+    .toLocaleString("vi-VN")
 })
 
 const handleChangeCountProduct = (index: number, typechange: number) => {
@@ -143,18 +162,18 @@ const handleChangeCountProduct = (index: number, typechange: number) => {
     product.count_product++
   }
 
-  console.log("conmeo");
-
-  store.addProductToCart(product, product.count_product)
+  store.updateProductToCart(product, product.count_product)
 }
 
-
 const clearProduct = (id: string) => {
-  store.cartproduct = store.cartproduct.filter(item => item.id !== id)
+  store.removeFromCart(id)
 }
 
 const totalCart = computed(() => {
-  return store.cartproduct.reduce((sum: number, item: any) => sum + item.count_product, 0)
+  return store.cartproduct.reduce(
+    (sum: number, item: any) => sum + item.count_product,
+    0
+  )
 })
 
 onMounted(() => {
@@ -164,12 +183,14 @@ onMounted(() => {
 })
 </script>
 
+
 <style>
 .delete-btn {
   width: 20px !important;
   height: 20px !important;
   padding: 0 !important;
 }
+
 .quantity-wrapper {
   border: 1px solid #e0e0e0;
   border-radius: 8px;

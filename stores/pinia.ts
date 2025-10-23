@@ -6,6 +6,11 @@ export interface CartItem {
   count_product: number
 }
 
+interface CustomerInfo {
+  id?: string,
+  customernote?: string
+  shippingtime?: string
+}
 
 export const useFruitStore = defineStore('websiteStore', {
   state: () => ({
@@ -16,13 +21,25 @@ export const useFruitStore = defineStore('websiteStore', {
     userinfo: {},
     chinhanh: 0,
     isLogin: false,
+    customer_info: {} as CustomerInfo,
   }),
   persist: {
     storage: piniaPluginPersistedstate.localStorage(),
   },
 
   actions: {
-    async addProductToCart(product: CartItem, changecount?: number) {
+
+    async updateCustomerInfo(customer_info: CustomerInfo) {
+      await $fetch(`/api/customer/update_customer_info`, {
+        method: "POST",
+        body: {
+          customer_info
+        },
+      })
+      this.customer_info = {...customer_info,shippingtime:customer_info?.shippingtime}
+    },
+
+    async updateProductToCart(product: CartItem, changecount?: number) {
       const exist = this.cartproduct.find((p) => p.id === product.id)
 
       const img = (product as any)?.imageInfo?.[1] ?? (product as any)?.imageInfo?.[0] ?? product.imginfo
@@ -45,16 +62,30 @@ export const useFruitStore = defineStore('websiteStore', {
       }
 
       try {
-        const response = await $fetch(`/api/product/add_product`, {
+        await $fetch(`/api/product/update_product`, {
           method: "POST",
           body: {
             user_id: (this.userinfo as any)?.id,
             cartproduct: this.cartproduct,
           },
         })
-        console.log("✅ Updated cart:", response)
       } catch (err) {
-        console.error("❌ Failed to update cart:", err)
+        console.error(" Failed to update cart:", err)
+      }
+    },
+
+    async removeFromCart(productId: string) {
+      this.cartproduct = this.cartproduct.filter(item => item.id !== productId)
+      try {
+        const response = await $fetch(`/api/product/update_product`, {
+          method: "POST",
+          body: {
+            user_id: (this.userinfo as any)?.id,
+            cartproduct: this.cartproduct,
+          },
+        })
+      } catch (err) {
+        throw createError({ statusCode: 500, statusMessage: "error" })
       }
     },
 
@@ -98,15 +129,16 @@ export const useFruitStore = defineStore('websiteStore', {
         credentials: "include"
       })
 
-      if (response_status_login) {
-        this.userinfo = response_status_login
+      if (response_status_login?.user) {
+        this.userinfo = response_status_login?.user
+        this.customer_info = response_status_login?.customer_info[0]
         this.isLogin = true
-        const response_cart_product: any = await $fetch(`/api/product/load-data-cart?user_id=${response_status_login?.id}`)
+        const response_cart_product: any = await $fetch(`/api/product/load-data-cart?user_id=${response_status_login?.user?.id}`)
         this.cartproduct = response_cart_product
       } else {
         this.isLogin = false
       }
-      return response_status_login
+      return response_status_login?.user
     },
 
     async logOut() {
@@ -127,15 +159,15 @@ export const useFruitStore = defineStore('websiteStore', {
     },
 
     async verifyToken(token: string) {
-      const response_status_verify = await $fetch(`/api/login/verify-token`, {
+      const response_status_verify: any = await $fetch(`/api/login/verify-token`, {
         method: "POST",
         body: { token },
       })
       if (response_status_verify) {
-        this.userinfo = response_status_verify
+        this.userinfo = response_status_verify?.user
         this.isLogin = true
-        const response_cart_product: any = await $fetch(`/api/product/load-data-cart?user_id=${(response_status_verify as any)?.id}`)
-        console.log(response_cart_product);
+        this.customer_info = response_status_verify?.customer_info[0]
+        const response_cart_product: any = await $fetch(`/api/product/load-data-cart?user_id=${response_status_verify?.user?.id}`)
         this.cartproduct = response_cart_product
       }
       return response_status_verify

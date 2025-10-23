@@ -53,7 +53,22 @@ export default defineEventHandler(async (event) => {
     }))
 
     const { password, ...safeinfo } = email_exist
-    return safeinfo
+    const customer_info = await db.customer.findMany({
+      where: {
+        id_user: email_exist.id
+      },
+      select: {
+        id: true,
+        customernote: true,
+        address:true,
+      }
+    })
+
+
+    return {
+      user: safeinfo,
+      customer_info
+    }
   } else {
     const user_id = `user_${String(payload?.exp).split('').reverse().join('').slice(0, 5)}`
     await db.users.create({

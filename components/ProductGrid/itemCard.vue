@@ -88,7 +88,7 @@ const navigateProductinfo = (id: any) => {
 }
 
 const addProductToCart = (product: any) => {
-  store.addProductToCart(product)
+  store.updateProductToCart(product)
   snackProduct.value = {
     name: product?.name,
     price: product?.price,

@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
       id: user.id,
       email: user.email,
       role: user.role,
-      name: user.name, 
+      name: user.name,
       avata: user.avata
     },
     secret,
@@ -62,5 +62,22 @@ export default defineEventHandler(async (event) => {
   }))
 
   const { password: _, ...safeUser } = user
-  return convertBigInt(safeUser)
+
+  const customer_info = await db.customer.findMany({
+    where: {
+      id_user: user.id
+    },
+    select: {
+      id: true,
+      customernote: true,
+      address:true,
+    }
+  })
+
+
+  return convertBigInt({
+    user: safeUser,
+    customer_info
+  })
+
 })

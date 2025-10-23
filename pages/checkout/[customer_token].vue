@@ -1,7 +1,6 @@
 <template>
   
   <div class="checkout-wrapper">
-    <!-- Thêm nút back -->
     <button class="btn-back" @click="$router.push('/cart')">
       <span>←</span> Quay lại giỏ hàng
     </button>
@@ -76,7 +75,6 @@
         <img :src="item?.imginfo.replace('_compact', '_small')" width="64" height="64" alt="SP"
           style="border-radius: 6px; border: 1px solid #ddd;" />
 
-        <!-- Badge số lượng -->
         <div v-if="item?.count_product >= 2" style="
       position: absolute;
       top: 0;
@@ -132,15 +130,17 @@ const store = useFruitStore()
 const product = computed(() => store.cartproduct)
 
 const form = ref({
-  fullname: '',
-  email: '',
-  phone: '',
-  address: '',
+  fullname: store?.userinfo?.name,
+  email: store?.userinfo?.email,
+  phone: store?.userinfo?.phonenumber,
+  address: store?.customer_info?.address,
   city: 'hcm',
   district: '470',
   ward: 'null',
   ship: 'sieutoc',
-  pay: 'cod'
+  pay: 'cod',
+  customernote:store?.customer_info?.customernote,
+  shippingtime:store?.customer_info?.shippingtime,
 })
 
 const coupon = ref('')

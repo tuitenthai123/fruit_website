@@ -18,31 +18,15 @@
               <div class="name-product">{{ item.name }}</div>
 
               <div class="quantity-wrapper d-flex align-center">
-                <v-btn
-                  @click="handleChangeCountProduct(index, 0)"
-                  :disabled="item.count_product <= 1"
-                  icon size="small"
-                  variant="outlined"
-                  class="quantity-btn quantity-btn-left"
-                  color="orange-darken-1"
-                >
+                <v-btn @click="handleChangeCountProduct(index, 0)" :disabled="item.count_product <= 1" icon size="small"
+                  variant="outlined" class="quantity-btn quantity-btn-left" color="orange-darken-1">
                   <v-icon size="18">mdi-minus</v-icon>
                 </v-btn>
 
-                <input
-                  v-model.number="item.count_product"
-                  type="number"
-                  min="1"
-                  class="quantity-input"
-                />
+                <input v-model.number="item.count_product" type="number" min="1" class="quantity-input" />
 
-                <v-btn
-                  @click="handleChangeCountProduct(index, 1)"
-                  icon size="small"
-                  variant="outlined"
-                  class="quantity-btn quantity-btn-right"
-                  color="orange-darken-1"
-                >
+                <v-btn @click="handleChangeCountProduct(index, 1)" icon size="small" variant="outlined"
+                  class="quantity-btn quantity-btn-right" color="orange-darken-1">
                   <v-icon size="18">mdi-plus</v-icon>
                 </v-btn>
               </div>
@@ -100,7 +84,7 @@ const handleChangeCountProduct = (index: number, typechange: number) => {
 }
 
 const clearProduct = (id: string) => {
-  store.cartproduct = store.cartproduct.filter(item => item.id !== id)
+  store.removeFromCart(id)
 }
 </script>
 
