@@ -74,7 +74,7 @@ watch(
       items.value.unshift({
         title: 'Xem đơn hàng',
         icon: 'mdi-eye-outline',
-        action: async () => {await router.push('/order/view')}
+        action: async () => {await router.push('/order')}
       })
     }
   },

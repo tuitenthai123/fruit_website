@@ -53,8 +53,6 @@
           </v-card>
         </v-col>
       </v-row>
-
-
     </div>
   </v-container>
 </template>
