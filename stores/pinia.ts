@@ -29,6 +29,37 @@ export const useFruitStore = defineStore('websiteStore', {
 
   actions: {
 
+    async addNewOrder(orderinfo: any) {
+
+
+      try {
+        const response_add_new_order = await $fetch(`/api/checkout/add_new_order`, {
+          method: "POST",
+          body: {
+            orderinfo
+          },
+        })
+        console.log(response_add_new_order);
+        console.log(orderinfo?.contact_address?.full_name);
+        const response_payment_url  = await $fetch('/api/create_payment_url', {
+          method: 'POST',
+          body: {
+            amount: orderinfo?.payment_details?.total,
+            id:orderinfo?.id,
+            name:orderinfo?.contact_address?.full_name
+          },
+        });
+        if (response_payment_url) {
+          window.location.href = (response_payment_url as any)?.paymentUrl;
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Lỗi khi gọi API thanh toán');
+      }
+
+
+    },
+
     async updateCustomerInfo(customer_info: CustomerInfo) {
       await $fetch(`/api/customer/update_customer_info`, {
         method: "POST",
@@ -36,7 +67,7 @@ export const useFruitStore = defineStore('websiteStore', {
           customer_info
         },
       })
-      this.customer_info = {...customer_info,shippingtime:customer_info?.shippingtime}
+      this.customer_info = { ...customer_info, shippingtime: customer_info?.shippingtime }
     },
 
     async updateProductToCart(product: CartItem, changecount?: number) {

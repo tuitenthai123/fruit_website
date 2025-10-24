@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
   process.env.TZ = "Asia/Ho_Chi_Minh";
   const date = new Date();
   const createDate = moment(date).format("YYYYMMDDHHmmss");
-  const orderId = moment(date).format("YYYYMMDDHHmmssSSS"); // unique
+  const orderId = moment(date).format("YYYYMMDDHHmmssSSS");
 
   const ipAddr =
     getHeader(event, "x-forwarded-for") ||
@@ -25,13 +25,12 @@ export default defineEventHandler(async (event) => {
     (event.node.req.socket && event.node.req.socket.remoteAddress) ||
     "";
 
-  // validate amount
   const rawAmount = Number(body?.amount);
   if (!rawAmount || isNaN(rawAmount) || rawAmount <= 0) {
     return createError({ statusCode: 400, statusMessage: "Invalid amount" });
   }
-  const amount = Math.round(rawAmount); // assume client sends 100000 for VND
-  const vnp_Amount = amount * 100; // VNPAY expects amount*100
+  const amount = Math.round(rawAmount);
+  const vnp_Amount = amount * 100;
 
   const bankCode = body?.bankCode || "";
   const locale = body?.language || "vn";
@@ -43,7 +42,7 @@ export default defineEventHandler(async (event) => {
     vnp_Locale: locale,
     vnp_CurrCode: "VND",
     vnp_TxnRef: orderId,
-    vnp_OrderInfo: `Thanh toan cho ma GD:${orderId}`,
+    vnp_OrderInfo: `Thanh toan cho khach hang ${body?.name} voi ma GD:${body?.id}`,
     vnp_OrderType: "other",
     vnp_Amount: String(vnp_Amount),
     vnp_ReturnUrl: returnUrl,
@@ -53,7 +52,6 @@ export default defineEventHandler(async (event) => {
 
   if (bankCode) vnpParams.vnp_BankCode = bankCode;
 
-  // build signData using helper
   const signData = makeSignData(vnpParams);
   const hmac = crypto.createHmac("sha512", secretKey);
   const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
@@ -61,28 +59,23 @@ export default defineEventHandler(async (event) => {
   // attach secure hash
   vnpParams.vnp_SecureHash = signed;
 
-  // Build final query string: we must encode values as VNPAY expects
-  // reuse the same encoding logic used in makeSignData (so keep consistent)
   const qsObj: Record<string, any> = {};
   Object.keys(vnpParams).sort().forEach((k) => {
     qsObj[k] = encodeURIComponent(String(vnpParams[k])).replace(/%20/g, "+");
   });
   const fullUrl = vnpUrl + "?" + qs.stringify(qsObj, { encode: false });
 
-  // Debug (temporary)
-  console.log("VNPAY create signData:", signData);
-  console.log("VNPAY create signed:", signed);
-  console.log("VNPAY paymentUrl:", fullUrl);
+  // console.log("VNPAY create signData:", signData);
+  // console.log("VNPAY create signed:", signed);
+  // console.log("VNPAY paymentUrl:", fullUrl);
 
-  // return paymentUrl for frontend to redirect
   return { success: true, paymentUrl: fullUrl, orderId };
 });
 
 function makeSignData(params: Record<string, any>) {
-  // remove secure hash keys if present
   const tmp: Record<string, any> = { ...params };
   delete tmp.vnp_SecureHash;
-delete tmp.vnp_SecureHashType;
+  delete tmp.vnp_SecureHashType;
 
   const keys = Object.keys(tmp).sort();
   const parts = keys.map((k) => {

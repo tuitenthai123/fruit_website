@@ -116,14 +116,6 @@ const deliveryOption = ref("now")
 const selectedDate = ref("Hôm nay")
 const selectedTime = ref("08:00 - 10:00")
 
-const deliveryInfo = computed(() => {
-  if (deliveryOption.value === "time") {
-    return `${selectedDate.value} - ${selectedTime.value}`
-  } else {
-    return "giaokhicohang"
-  }
-})
-
 const dateOptions = ["Hôm nay", "Ngày mai", "Ngày kia"]
 const timeOptions = [
   "08:00 - 10:00",
@@ -132,15 +124,22 @@ const timeOptions = [
   "16:00 - 18:00",
 ]
 
+const deliveryInfo = computed(() => {
+  if (deliveryOption.value === "time") {
+    return `${selectedDate.value} - ${selectedTime.value}`
+  } else {
+    return "giaokhicohang"
+  }
+})
+
 const goToCheckout = () => {
-  console.log("Thông tin giao hàng:", deliveryInfo.value)
   const customer_info = {
     shippingtime: deliveryInfo.value,
-    customernote: store?.customer_info?.customernote,
-    id: store?.customer_info?.id,
+    customernote: store?.customer_info?.customernote || "",
+    id: store?.customer_info?.id || crypto.randomUUID(),
   }
   store.updateCustomerInfo(customer_info)
-  router.push(`/checkout/${store?.customer_info?.id}`)
+  router.push(`/checkout/${customer_info.id}`)
 }
 
 const totalPrice = computed(() => {
@@ -180,8 +179,26 @@ onMounted(() => {
   setTimeout(() => {
     loading.value = false
   }, 1500)
+
+  const info = store.customer_info
+
+  if (info?.shippingtime) {
+    if (info.shippingtime === "giaokhicohang") {
+      deliveryOption.value = "now"
+    } else {
+      deliveryOption.value = "time"
+      const [date, starttime, endtime] = info.shippingtime.split(" - ")
+      if (date) selectedDate.value = date
+      if (starttime) selectedTime.value = `${starttime} - ${endtime}`
+    }
+  }
+
+  if (info?.customernote) {
+    store.customer_info.customernote = info.customernote
+  }
 })
 </script>
+
 
 
 <style>

@@ -5,7 +5,7 @@ async function checkout() {
   try {
     const { paymentUrl } = await $fetch('/api/create_payment_url', {
       method: 'POST',
-      body: { amount }, // gửi JSON
+      body: { amount },
     });
     if (paymentUrl) {
       window.location.href = paymentUrl;

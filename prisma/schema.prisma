@@ -20,27 +20,38 @@ model Product {
 }
 
 model Users {
-  id          String   @id @default(dbgenerated())
+  id          String    @id @default(dbgenerated())
   name        String
-  email       String   @unique
+  email       String    @unique
   password    String?
   role        String
-  avata       String   @default("https://avatars0.githubusercontent.com/u/9064066?v=4&s=460")
-  phonenumber BigInt?  @unique
-  active      Boolean  @default(false)
-  status      Boolean  @default(true)
+  avata       String    @default("https://avatars0.githubusercontent.com/u/9064066?v=4&s=460")
+  phonenumber BigInt?   @unique
+  active      Boolean   @default(false)
+  status      Boolean   @default(true)
   expiredDate DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
-
 model Customer {
-  id          String   @id @default(dbgenerated())
-  id_user     String
-  productcart Json?
-  address     String?
-  customernote String?
-  shippingtime String?
+  id                       String  @id @default(dbgenerated())
+  id_user                  String
+  productcart              Json?
+  address                  String?
+  customernote             String?
+  shippingtime             String?
   administrative_divisions String?
+}
+
+model Order {
+  id String @id @default(dbgenerated())
+  order_id String?
+  response_code String?
+  payment_method String?
+  order_details Json
+  payment_details Json
+  product Json
+  contact Json
+  contact_address Json
 }

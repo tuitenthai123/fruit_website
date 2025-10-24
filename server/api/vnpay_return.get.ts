@@ -1,10 +1,10 @@
 import qs from "qs";
 import crypto from "crypto";
+import { db } from "~/lib/prisma";
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event) as Record<string, any>;
 
-  // copy and remove securehash fields
   const secureHash = query["vnp_SecureHash"] as string | undefined;
   if (!secureHash) {
     return createError({ statusCode: 400, statusMessage: "Missing vnp_SecureHash" });
@@ -18,21 +18,33 @@ export default defineEventHandler(async (event) => {
   const secretKey = (config.private.NUXT_VNP_HASHSECRET || "").trim();
   if (!secretKey) return createError({ statusCode: 500, statusMessage: "Missing secret" });
 
-  // build signData in same way
   const signData = makeSignData(tmp);
 
   const hmac = crypto.createHmac("sha512", secretKey);
   const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
 
-  // Debug
   console.log("VNPAY return raw query:", query);
   console.log("VNPAY return signData:", signData);
   console.log("VNPAY return computed signed:", signed);
   console.log("VNPAY return secureHash from VNPAY:", secureHash);
 
   if (secureHash === signed) {
-    // success -> update order status in DB here using vnp_TxnRef
+
+
     const responseCode = tmp.vnp_ResponseCode || null;
+    const id_order = (tmp?.vnp_OrderInfo as string).split(":")
+
+    console.log(id_order[1]);
+    await db.order.updateMany({
+      where: {
+        id: id_order[1]
+      },
+      data: {
+        order_id: tmp.vnp_TxnRef,
+        response_code: tmp.vnp_ResponseCode,
+        payment_method: tmp.vnp_CardType
+      }
+    })
     return { success: true, code: responseCode, params: tmp };
   } else {
     return { success: false, code: "97", message: "Invalid signature" };

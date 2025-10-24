@@ -1,12 +1,12 @@
 <template>
-  
+
   <div class="checkout-wrapper">
     <button class="btn-back" @click="$router.push('/cart')">
       <span>←</span> Quay lại giỏ hàng
     </button>
-    
+
     <div class="checkout-left">
-      
+
       <h2>Thông tin giao hàng</h2>
       <form @submit.prevent="onSubmit">
         <div class="form-row">
@@ -124,6 +124,8 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
+import moment from 'moment'
+import generateRandomId from '~/lib/randomID'
 
 const store = useFruitStore()
 
@@ -139,8 +141,8 @@ const form = ref({
   ward: 'null',
   ship: 'sieutoc',
   pay: 'cod',
-  customernote:store?.customer_info?.customernote,
-  shippingtime:store?.customer_info?.shippingtime,
+  customernote: store?.customer_info?.customernote,
+  shippingtime: store?.customer_info?.shippingtime,
 })
 
 const coupon = ref('')
@@ -238,26 +240,43 @@ function onSubmit() {
   if (form.value.district === 'null' || form.value.ward === 'null')
     return alert('Vui lòng chọn quận/huyện và phường/xã.')
 
+  const payment_date = moment(new Date()).format("YYYYMMDDHHmmssSSS");
+  const detail_address = `Hồ Chí Minh - ${districts.find(d => d.value === form.value.district)?.text} - ${wardOptions.value.find(w => w.value === form.value.ward)?.text}`
+
+  const form_detail = form?.value
+
   const orderData = {
-    ...form.value,
-    district: districts.find(d => d.value === form.value.district)?.text || '',
-    ward: wardOptions.value.find(w => w.value === form.value.ward)?.text || '',
+    id: generateRandomId(10),
+    order_details: {
+      payment_date,
+      shipping_menthod: form_detail?.ship,
+      shopping_type: form.value.pay === 'cod' ? 'Thanh toán khi nhận hàng' : 'Chuyển khoản ngân hàng',
+    },
     products: product.value.map(item => ({
       name: item.name,
       price: item.price,
       quantity: item.count_product || 1
     })),
-    payment: {
+    payment_details: {
       subtotal: subtotal.value,
       shippingFee: shippingPrice.value,
       total: total.value,
-      method: form.value.pay === 'cod' ? 'Thanh toán khi nhận hàng' : 'Chuyển khoản ngân hàng',
-      shippingMethod: form.value.ship
+    },
+    contact: {
+      email: form_detail?.email,
+      phone: form_detail?.phone,
+      note: store?.customer_info?.customernote
+    },
+    contact_address: {
+      address: form_detail?.address,
+      detail_address,
+      full_name: form_detail?.fullname
     }
   }
-
   console.log('Chi tiết đơn hàng:', orderData)
-  alert(`Đặt hàng thành công!\nPhí ship: ${shippingPriceText.value}\nTổng: ${totalText.value}`)
+  store.addNewOrder(orderData)
+
+  
 }
 
 onMounted(() => updateWards(form.value.district))
