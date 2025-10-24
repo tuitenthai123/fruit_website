@@ -34,7 +34,6 @@ export default defineEventHandler(async (event) => {
     const responseCode = tmp.vnp_ResponseCode || null;
     const id_order = (tmp?.vnp_OrderInfo as string).split(":")
 
-    console.log(id_order[1]);
     await db.order.updateMany({
       where: {
         id: id_order[1]

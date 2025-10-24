@@ -46,7 +46,9 @@ model Customer {
 
 model Order {
   id String @id @default(dbgenerated())
+  approve_status Boolean @default(false)
   order_id String?
+  user_id String?
   response_code String?
   payment_method String?
   order_details Json

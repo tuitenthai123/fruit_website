@@ -6,6 +6,7 @@ export default defineEventHandler(async (event) => {
   const response_add_new_order = await db.order.create({
     data:{
       id:data?.id,
+      user_id:data?.user_id,
       order_details:data?.order_details,
       payment_details:data?.payment_details,
       product:data?.products,

@@ -76,22 +76,22 @@
           style="border-radius: 6px; border: 1px solid #ddd;" />
 
         <div v-if="item?.count_product >= 2" style="
-      position: absolute;
-      top: 0;
-      left: 0;
-      background: red;
-      color: white;
-      font-size: 12px;
-      font-weight: bold;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transform: translate(-30%, -30%);
-      box-shadow: 0 0 4px rgba(0,0,0,0.3);
-    ">
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: red;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: translate(-30%, -30%);
+            box-shadow: 0 0 4px rgba(0,0,0,0.3);
+          ">
           {{ item.count_product }}
         </div>
 
@@ -234,7 +234,17 @@ function applyCoupon() {
   alert(`Áp mã: ${coupon.value} (demo)`)
 }
 
-function onSubmit() {
+function getShippingMethodText(value) {
+  const map = {
+    "sieutoc": 'HCM - Siêu tốc',
+    '4h': 'HCM - Giao trong 4 giờ',
+    "sieure2h": 'HCM - Siêu rẻ 2H',
+    '30p': 'Siêu tốc (30 phút / 5km)',
+  }
+  return map[value] || 'Không xác định'
+}
+
+async function onSubmit() {
   if (!form.value.fullname || !form.value.phone || !form.value.address)
     return alert('Vui lòng điền đầy đủ thông tin.')
   if (form.value.district === 'null' || form.value.ward === 'null')
@@ -243,17 +253,20 @@ function onSubmit() {
   const payment_date = moment(new Date()).format("YYYYMMDDHHmmssSSS");
   const detail_address = `Hồ Chí Minh - ${districts.find(d => d.value === form.value.district)?.text} - ${wardOptions.value.find(w => w.value === form.value.ward)?.text}`
 
-  const form_detail = form?.value
+  const form_detail = form.value
 
   const orderData = {
     id: generateRandomId(10),
+    user_id: store?.userinfo?.id,
+    payment_method: form_detail.pay === 'cod' ? 'COD' : 'BANK',
     order_details: {
       payment_date,
-      shipping_menthod: form_detail?.ship,
-      shopping_type: form.value.pay === 'cod' ? 'Thanh toán khi nhận hàng' : 'Chuyển khoản ngân hàng',
+      shipping_menthod: getShippingMethodText(form_detail.ship),
+      shopping_type: form_detail.pay === 'cod' ? 'Thanh toán khi nhận hàng' : 'Chuyển khoản ngân hàng',
     },
     products: product.value.map(item => ({
       name: item.name,
+      imginfo: item.imginfo,
       price: item.price,
       quantity: item.count_product || 1
     })),
@@ -263,20 +276,20 @@ function onSubmit() {
       total: total.value,
     },
     contact: {
-      email: form_detail?.email,
-      phone: form_detail?.phone,
+      email: form_detail.email,
+      phone: form_detail.phone,
       note: store?.customer_info?.customernote
     },
     contact_address: {
-      address: form_detail?.address,
+      address: form_detail.address,
       detail_address,
-      full_name: form_detail?.fullname
+      full_name: form_detail.fullname
     }
   }
-  console.log('Chi tiết đơn hàng:', orderData)
-  store.addNewOrder(orderData)
 
-  
+  console.log('Chi tiết đơn hàng:', orderData)
+
+  await store.addNewOrder(orderData)
 }
 
 onMounted(() => updateWards(form.value.district))

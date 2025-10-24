@@ -29,36 +29,50 @@ export const useFruitStore = defineStore('websiteStore', {
 
   actions: {
 
+    async fetchDataOrder(user_id: string) {
+      const response_data_order = await $fetch(`/api/order/load_data_order`, {
+        method: "POST",
+        body: {
+          user_id
+        },
+      })
+      return response_data_order
+    },
+
     async addNewOrder(orderinfo: any) {
-
-
       try {
         const response_add_new_order = await $fetch(`/api/checkout/add_new_order`, {
           method: "POST",
-          body: {
-            orderinfo
-          },
+          body: { orderinfo },
         })
         console.log(response_add_new_order);
-        console.log(orderinfo?.contact_address?.full_name);
-        const response_payment_url  = await $fetch('/api/create_payment_url', {
+        if (orderinfo?.payment_method === 'COD') {
+          const response_cod_payment = await $fetch(`/api/checkout/add_cod_order`, {
+            method: "POST",
+            body: { user_id:orderinfo?.id },
+          })
+          console.log(response_cod_payment);
+          return
+        }
+
+        const response_payment_url = await $fetch('/api/create_payment_url', {
           method: 'POST',
           body: {
             amount: orderinfo?.payment_details?.total,
-            id:orderinfo?.id,
-            name:orderinfo?.contact_address?.full_name
+            id: orderinfo?.id,
+            name: orderinfo?.contact_address?.full_name
           },
-        });
+        })
+
         if (response_payment_url) {
-          window.location.href = (response_payment_url as any)?.paymentUrl;
+          window.location.href = (response_payment_url as any)?.paymentUrl
         }
       } catch (err) {
-        console.error(err);
-        alert('Lỗi khi gọi API thanh toán');
+        console.error(err)
+        alert('Lỗi khi gọi API thanh toán')
       }
-
-
     },
+
 
     async updateCustomerInfo(customer_info: CustomerInfo) {
       await $fetch(`/api/customer/update_customer_info`, {
