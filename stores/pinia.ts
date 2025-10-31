@@ -176,38 +176,45 @@ export const useFruitStore = defineStore('websiteStore', {
     },
 
     async updateProductToCart(product: CartItem, changecount?: number) {
-      const exist = this.cartproduct.find((p) => p.id === product.id)
+      if (this.isLogin) {
+        const exist = this.cartproduct.find((p) => p.id === product.id)
 
-      const img = (product as any)?.imageInfo?.[1] ?? (product as any)?.imageInfo?.[0] ?? product.imginfo
-      const product_fix: CartItem = { ...product, imginfo: img }
+        const img = (product as any)?.imageInfo?.[1] ?? (product as any)?.imageInfo?.[0] ?? product.imginfo
+        const product_fix: CartItem = { ...product, imginfo: img }
 
-      if (exist) {
-        if (changecount !== undefined) {
-          exist.count_product = changecount
+        if (exist) {
+          if (changecount !== undefined) {
+            exist.count_product = changecount
+          } else {
+            exist.count_product += 1
+          }
         } else {
-          exist.count_product += 1
+          this.cartproduct.push({
+            id: product_fix.id,
+            name: product_fix.name,
+            price: product_fix.price,
+            imginfo: product_fix.imginfo,
+            count_product: changecount ?? 1,
+          })
+        }
+
+        try {
+          await $fetch(`/api/product/update_product`, {
+            method: "POST",
+            body: {
+              user_id: (this.userinfo as any)?.id,
+              cartproduct: this.cartproduct,
+            },
+          })
+        } catch (err) {
+          console.error(" Failed to update cart:", err)
         }
       } else {
-        this.cartproduct.push({
-          id: product_fix.id,
-          name: product_fix.name,
-          price: product_fix.price,
-          imginfo: product_fix.imginfo,
-          count_product: changecount ?? 1,
-        })
+        alert("Đăng nhập trước khi mua hàng bạn nhé!")
+        const router = useRouter()
+        router.push('/login')
       }
 
-      try {
-        await $fetch(`/api/product/update_product`, {
-          method: "POST",
-          body: {
-            user_id: (this.userinfo as any)?.id,
-            cartproduct: this.cartproduct,
-          },
-        })
-      } catch (err) {
-        console.error(" Failed to update cart:", err)
-      }
     },
 
     async removeFromCart(productId: string) {
