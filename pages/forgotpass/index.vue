@@ -63,7 +63,6 @@ const resetPassword = async (email) => {
     await callOnce(async () => {
       const response_renew = await store.renewEmailPassword(email)
       email_sendding_status.value = response_renew
-      console.log("meomeo")
     })
     if (email_sendding_status.value) {
       snackColor.value="green"

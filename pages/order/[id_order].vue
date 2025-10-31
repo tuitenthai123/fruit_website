@@ -1,20 +1,17 @@
 <template>
   <v-container class="py-10" style="max-width: 800px;">
     <div class="text-center mb-4">
-      <v-icon :color="orderData?.approve_status ? 'success' : 'warning'" class="icon-large">
-        {{ orderData?.approve_status ? 'mdi-check-circle-outline' : 'mdi-clock-outline' }}
+      <v-icon :color="getStatusColor(orderData)" class="icon-large">
+        {{ getStatusIcon(orderData) }}
       </v-icon>
     </div>
 
     <div class="text-center mb-8">
       <h2 class="font-weight-medium mb-2">
-        {{ orderData?.approve_status ? 'Thanh toán thành công' : 'Chờ thanh toán' }}
+        {{ getStatusTitle(orderData) }}
       </h2>
       <p class="text-body-2 text-grey-darken-1">
-        {{ orderData?.approve_status
-          ? 'Cảm ơn bạn đã mua hàng. Chúng tôi sẽ thông báo thông tin đơn hàng qua email trong thời gian sớm nhất'
-          : 'Đơn hàng của bạn đang chờ thanh toán. Vui lòng hoàn tất thanh toán để tiếp tục xử lý đơn hàng'
-        }}
+        {{ getStatusMessage(orderData) }}
       </p>
     </div>
 
@@ -30,7 +27,7 @@
 
         <v-col cols="6" class="text-body-2">Phương thức vận chuyển:</v-col>
         <v-col cols="6" class="text-right">
-          {{ orderData?.order_details?.shipping_menthod }}
+          {{orderData?.order_details?.shipping_menthod }}
         </v-col>
 
         <v-col cols="6" class="text-body-2">Phương thức thanh toán:</v-col>
@@ -57,9 +54,7 @@
       <h3 class="mb-4">Thông tin sản phẩm</h3>
       <div v-for="(item, index) in orderData?.product" :key="index">
         <div class="pa-3 mb-3 d-flex align-center justify-space-between">
-          <div
-            style="flex: 0 0 80px; position: relative; display: flex; align-items: center; justify-content: center;"
-          >
+          <div style="flex: 0 0 80px; display: flex; align-items: center; justify-content: center;">
             <img :src="(item.imginfo).replace('_compact', '_medium')" width="80" height="80" />
           </div>
           <div style="flex: 1; padding: 0 16px;">
@@ -73,8 +68,10 @@
             <div class="d-flex justify-space-between">
               <span style="font-weight: 500; font-size: 15px;">Số lượng: {{ item.quantity }}</span>
               <span style="font-weight: 500; font-size: 15px;">
-                Tổng: <span style="color: #f36f3f; font-weight: 700;">{{ formatPrice(parsePrice(item.price) *
-                  item.quantity) }}</span>
+                Tổng:
+                <span style="color: #f36f3f; font-weight: 700;">
+                  {{ formatPrice(parsePrice(item.price) * item.quantity) }}
+                </span>
               </span>
             </div>
           </div>
@@ -137,6 +134,37 @@ function getShippingName(value?: string) {
     "30p": "Siêu tốc (30p/5km)",
   }
   return map[value ?? ""] || "Không xác định"
+}
+
+const getStatusColor = (order: any) => {
+  if (!order) return "grey"
+  if (!order.approve_status) return "warning"
+  return order.response_code === "00" ? "success" : "error"
+}
+
+const getStatusIcon = (order: any) => {
+  if (!order) return "mdi-help-circle-outline"
+  if (!order.approve_status) return "mdi-clock-outline"
+  return order.response_code === "00"
+    ? "mdi-check-circle-outline"
+    : "mdi-close-circle-outline"
+}
+
+const getStatusTitle = (order: any) => {
+  if (!order) return ""
+  if (!order.approve_status) return "Đang xác nhận đơn hàng"
+  return order.response_code === "00"
+    ? "Thanh toán thành công"
+    : "Giao dịch bị hủy"
+}
+
+const getStatusMessage = (order: any) => {
+  if (!order) return ""
+  if (!order.approve_status)
+    return "Đơn hàng của bạn đang được xác nhận. Vui lòng chờ trong giây lát."
+  if (order.response_code === "00")
+    return "Cảm ơn bạn đã mua hàng. Chúng tôi sẽ thông báo thông tin đơn hàng qua email trong thời gian sớm nhất."
+  return "Người dùng đã hủy giao dịch hoặc thanh toán không thành công. Vui lòng thử lại hoặc chọn phương thức khác."
 }
 
 onMounted(async () => {

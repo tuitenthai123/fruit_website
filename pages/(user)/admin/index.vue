@@ -489,8 +489,6 @@ const removeUser = async (id) => {
   }
 }
 
-
-
 const showPasswordDialog = (password) => {
   selectedPassword.value = password
   passwordDialog.value = true
@@ -600,10 +598,8 @@ const onSaveUser = async () => {
     }
 
     if (isEditing.value && currentUser.value.id) {
-      console.log(payload_newuser)
       await updateUser(currentUser.value.id, payload_newuser)
     } else {
-      console.log(payload_newuser)
       await addUser(payload_newuser)
     }
 

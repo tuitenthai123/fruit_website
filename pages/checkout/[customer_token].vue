@@ -286,9 +286,6 @@ async function onSubmit() {
       full_name: form_detail.fullname
     }
   }
-
-  console.log('Chi tiết đơn hàng:', orderData)
-
   await store.addNewOrder(orderData)
 }
 

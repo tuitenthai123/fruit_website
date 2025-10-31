@@ -1,3 +1,5 @@
+import Fuse from "fuse.js"
+
 export interface CartItem {
   id: string
   name: string
@@ -17,17 +19,106 @@ export const useFruitStore = defineStore('websiteStore', {
     mainpagedata: [],
     cartproduct: [] as CartItem[],
     productdata: [],
+    allproduct: [],
     productitemdata: {},
     userinfo: {},
     chinhanh: 0,
     isLogin: false,
     customer_info: {} as CustomerInfo,
+    searchCache: new Map<string, { data: any[]; time: number }>(),
+    searchTTL: 1000 * 60 * 10,
   }),
   persist: {
     storage: piniaPluginPersistedstate.localStorage(),
   },
 
   actions: {
+    _getCache(key: string) {
+      const sc: any = (this as any).searchCache
+      if (!sc) return undefined
+      if (sc instanceof Map) return sc.get(key)
+      return sc[key]
+    },
+
+    _setCache(key: string, value: { data: any[]; time: number }) {
+      const sc: any = (this as any).searchCache
+      if (sc instanceof Map) {
+        sc.set(key, value)
+      } else {
+        ; (this as any).searchCache = { ...(sc || {}), [key]: value }
+      }
+    },
+
+    async searchProductHybrid(keyword: string) {
+      if (!keyword || keyword.trim().length < 2) return []
+
+      const now = Date.now()
+      const cacheKey = keyword.toLowerCase()
+      const cached: any = this._getCache(cacheKey)
+
+      if (cached && now - cached.time < this.searchTTL) {
+        this.refreshSearch(keyword)
+        return cached.data
+      }
+
+      const localResults = this.searchLocal(keyword)
+
+      if (localResults.length > 0) {
+        this._setCache(cacheKey, { data: localResults, time: now })
+        this.refreshSearch(keyword)
+        return localResults
+      }
+
+      const fresh = await this.fetchSearchFromApi(keyword)
+      this._setCache(cacheKey, { data: fresh, time: now })
+      return fresh
+    },
+
+    searchLocal(keyword: string) {
+      if (!this.allproduct.length) return []
+      const fuse = new Fuse(this.allproduct, {
+        keys: ["name"],
+        threshold: 0.4,
+      })
+      return fuse.search(keyword).map(r => r.item)
+    },
+
+    async refreshSearch(keyword: string) {
+      try {
+        const fresh = await this.fetchSearchFromApi(keyword)
+        this._setCache(keyword.toLowerCase(), {
+          data: fresh,
+          time: Date.now(),
+        })
+      } catch (err) {
+        console.error("refreshSearch fail:", err)
+      }
+    },
+
+    async fetchSearchFromApi(keyword: string) {
+      const result = await $fetch(`/api/product/get-all-product?query=${encodeURIComponent(keyword)}`)
+      return result as any[]
+    },
+    async fetchAllDataProduct() {
+      const response_all_data = await $fetch(`/api/product/get-all-product`)
+      this.allproduct = response_all_data as any
+    },
+
+    async updateOrderStatus(status: boolean, id: string) {
+      const response_data_order = await $fetch(`/api/order/update_status_order`, {
+        method: "POST",
+        body: {
+          id,
+          status
+        },
+      })
+      return response_data_order
+    },
+
+    async fetchDataOrderDashboard() {
+      const response_data_order = await $fetch(`/api/order/load_all_data_order`)
+      return response_data_order
+    },
 
     async fetchDataOrder(user_id: string) {
       const response_data_order = await $fetch(`/api/order/load_data_order`, {
@@ -45,15 +136,15 @@ export const useFruitStore = defineStore('websiteStore', {
           method: "POST",
           body: { orderinfo },
         })
-        console.log(response_add_new_order);
         if (orderinfo?.payment_method === 'COD') {
           const response_cod_payment = await $fetch(`/api/checkout/add_cod_order`, {
             method: "POST",
-            body: { user_id:orderinfo?.id },
+            body: { user_id: orderinfo?.id },
           })
-          console.log(response_cod_payment);
           return
         }
+
+        this.cartproduct = []
 
         const response_payment_url = await $fetch('/api/create_payment_url', {
           method: 'POST',

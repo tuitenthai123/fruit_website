@@ -54,7 +54,7 @@ watch(
 
     items.value = items.value.filter(
       (i) =>
-        !['Admin Dashboard', 'Quản lý đơn hàng', 'Xem đơn hàng'].includes(i.title)
+        !['Admin Dashboard', 'Quản lý đơn hàng', 'Đơn hàng của tôi'].includes(i.title)
     )
 
     // Thêm theo role
@@ -68,11 +68,11 @@ watch(
       items.value.unshift({
         title: 'Quản lý đơn hàng',
         icon: 'mdi-clipboard-list-outline',
-        action: async () => { await router.push('/order/manage') }
+        action: async () => { await router.push('/manage') }
       })
     } else if (role === '2') {
       items.value.unshift({
-        title: 'Xem đơn hàng',
+        title: 'Đơn hàng của tôi',
         icon: 'mdi-eye-outline',
         action: async () => {await router.push('/order')}
       })

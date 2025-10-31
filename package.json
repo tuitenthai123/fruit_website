@@ -16,6 +16,7 @@
     "bcrypt": "^6.0.0",
     "cheerio": "^1.1.2",
     "cookie": "^1.0.2",
+    "fuse.js": "^7.1.0",
     "google-auth-library": "^10.2.1",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",

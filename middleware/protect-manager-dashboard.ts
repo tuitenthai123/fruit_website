@@ -12,7 +12,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   }
 
   const response = await store.checkrole(user_id);
-  if (response?.[0]?.role !== "0") {
+  if (response?.[0]?.role !== "1") {
     throw createError({
       statusCode: 403,
       statusMessage: "Bạn không có quyền truy cập vào trang này.",

@@ -44,9 +44,8 @@ export default defineEventHandler(async (event) => {
         payment_method: tmp.vnp_CardType
       }
     })
-    return { success: true, code: responseCode, params: tmp };
-  } else {
-    return { success: false, code: "97", message: "Invalid signature" };
+    const redirectUrl = `/order/${tmp.vnp_TxnRef}`;
+    return sendRedirect(event, redirectUrl);
   }
 });
 

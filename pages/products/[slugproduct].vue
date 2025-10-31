@@ -42,7 +42,7 @@
                 </v-window>
 
                 <div class="image-counter">
-                  {{ window + 1 }} / {{ productData?.imageInfo.length }}
+                  {{ window + 1 }} / {{ productData?.imageInfo?.length ?? 0 }}
                 </div>
               </div>
 
@@ -57,10 +57,11 @@
           <v-col cols="12" sm="5" class="my-5">
             <h1 style="font-weight: 700; color: rgb(243, 111, 64); font-size: 24px;">{{ productData?.name }}</h1>
             <div>
-              <span style="font-size: 14px;">Mã sản phẩm <span
-                  style="color:rgb(243, 111, 64);font-weight: 500; ">{{ productData?.id }}</span></span>
+              <span style="font-size: 14px;">Mã sản phẩm <span style="color:rgb(243, 111, 64);font-weight: 500; ">{{
+                  productData?.id }}</span></span>
               <v-divider vertical class="mx-3" style="height: 15px;" thickness="2"></v-divider>
-              <span style="font-size: 14px;">Tình trạng: <span style="color:rgb(243, 111, 64); font-weight: 500;">{{ productData?.status }}</span></span>
+              <span style="font-size: 14px;">Tình trạng: <span style="color:rgb(243, 111, 64); font-weight: 500;">{{
+                  productData?.status }}</span></span>
             </div>
             <h1 style="font-weight: 700; color: rgb(243, 111, 64); font-size: 18px;" class="py-3">Mã giảm giá</h1>
 
@@ -70,7 +71,7 @@
             </div>
 
             <div class="mt-3">
-              <span style="font-size: 25px;font-weight: 600;color: red;">{{productData?.price}}</span>
+              <span style="font-size: 25px;font-weight: 600;color: red;">{{ productData?.price }}</span>
             </div>
 
             <div class="d-flex align-center ga-4">
@@ -89,7 +90,8 @@
                 </v-btn>
               </div>
 
-              <v-btn color="orange-darken-1" size="large" class="add-to-cart-btn" prepend-icon="mdi-cart-plus">
+              <v-btn color="orange-darken-1" size="large" class="add-to-cart-btn" prepend-icon="mdi-cart-plus"
+                @click="handleAddToCard(productData)">
                 Thêm vào giỏ
               </v-btn>
             </div>
@@ -161,52 +163,79 @@
       </div>
     </v-container>
   </v-app>
+  <v-snackbar class="pa-1" v-model="snackbar" color="white" location="top right" :timeout="2000">
+    <div class="d-flex justify-space-between align-center mb-2">
+      <span style="color: #e53935; font-weight: 700;">Đã thêm vào giỏ hàng thành công!</span>
+      <v-btn icon small variant="text" @click="snackbar = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </div>
+
+
+    <div class="d-flex align-start" style="gap: 10px; align-items: flex-start; overflow: hidden;">
+      <v-img :src="snackProduct?.imginfo" max-width="70" min-width="70" height="70" cover
+        style="border: 1px solid #eee; border-radius: 6px; flex-shrink: 0;" />
+
+      <div style="
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        word-wrap: break-word;
+        white-space: normal;
+      ">
+        <div style="
+          font-weight: 600;
+          font-size: 14px;
+          color: #333;
+          line-height: 1.3;
+          word-break: break-word;
+        ">
+          {{ snackProduct?.name }}
+        </div>
+
+        <div style="color: #f36f3f; font-weight: 700; margin-top: 4px;">
+          {{ snackProduct?.price }}
+        </div>
+      </div>
+    </div>
+  </v-snackbar>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
+
+const snackbar = ref(false)
+const snackProduct = ref<any>(null)
 
 interface productItem {
   name?: string,
   id?: string,
   slug?: string,
   status?: string,
-  imageInfo: string[],
+  imageInfo?: string[],
   description?: string,
   price?: string,
   discount?: string[]
 }
 
-
-
 const route = useRoute()
 const store = useFruitStore() as any
+
+// giữ tên window như template của bạn (nếu muốn đổi tránh shadowing, có thể đổi)
 const window = ref(0)
 const productData = ref<productItem | null>(null)
 let show_more = ref(false)
-let count_product = ref(1)
-const id_product = route.params.slugproduct
+
+// Số lượng hiển thị trong input (giữ như bạn dùng)
+let count_product = ref<number>(1)
+
+const id_product = String(route.params.slugproduct || '')
 let product_catelory = "Trái ngon hôm nay"
 let product_slug = "all-product"
 const product_type = id_product.slice(0, 2)
 
-
-const fetchDataProductItem = async (id: any) => {
-  await store.fetchDataItemProduct(id)
-  productData.value = store.productitemdata
-
-  if (productData.value?.imageInfo) {
-    productData.value.imageInfo = productData.value.imageInfo.map((url) =>
-      url.includes('_compact') ? url.replace('_compact', '_master') : url
-    )
-  }
-}
-
-onMounted(() => {
-  fetchDataProductItem(id_product)
-})
-
+// cập nhật category theo prefix
 switch (product_type) {
   case "VI":
     product_catelory = "Trái cây Việt Nam"
@@ -221,13 +250,6 @@ switch (product_type) {
     product_slug = "pre-cut-product"
     break
 }
-
-
-const images = [
-  'https://product.hstatic.net/200000377165/product/1-copy_d7f57f26299a463b90c273ffe97a1718_master.jpg',
-  'https://product.hstatic.net/200000377165/product/2-copy_4c0fc1939d2e4788ae3f168bd605aa50_master.jpg',
-  'https://product.hstatic.net/200000377165/product/3-copy_02e7fa1473504c89b8d0946b966f4b0a_master.jpg'
-]
 
 const sticky_panel_item = [
   {
@@ -244,8 +266,130 @@ const sticky_panel_item = [
   },
 ]
 
-const handleChangeCountProduct = (typechange: number) => {
-  typechange === 0 ? --count_product.value : ++count_product.value
+const fetchDataProductItem = async (id: any) => {
+  if (!id) {
+    productData.value = null
+    count_product.value = 1
+    return
+  }
+
+  await store.fetchDataItemProduct(id)
+  productData.value = store.productitemdata || null
+
+  if (productData.value?.imageInfo && Array.isArray(productData.value.imageInfo)) {
+    productData.value.imageInfo = productData.value.imageInfo.map((url: string) =>
+      url.includes('_compact') ? url.replace('_compact', '_master') : url
+    )
+  }
+
+  if (productData.value?.id) {
+    const existing = (store.cartproduct || []).find((p: any) => p.id === productData.value!.id)
+    count_product.value = existing ? existing.count_product : 1
+  } else {
+    count_product.value = 1
+  }
+
+  window.value = 0
+}
+
+onMounted(() => {
+  fetchDataProductItem(id_product)
+})
+
+watch(() => route.params.slugproduct, (v) => {
+  fetchDataProductItem(String(v))
+})
+
+function makeProductForStore(p: any) {
+  return {
+    id: p?.id,
+    name: p?.name ?? '',
+    price: p?.price ?? '0₫',
+    imageInfo: p?.imageInfo ?? [],
+    imginfo: (p?.imageInfo && p?.imageInfo[0]) ?? p?.imginfo ?? '',
+  }
+}
+
+
+const handleChangeCountProduct = async (typechange: number) => {
+  if (!productData.value?.id) return
+
+  const id = productData.value.id
+  const existing = (store.cartproduct || []).find((p: any) => p.id === id)
+  const productForStore = makeProductForStore(productData.value)
+
+  if (typechange === 0) {
+    if (existing) {
+      const newCount = existing.count_product - 1
+      if (newCount <= 0) {
+        try {
+          await store.removeFromCart(id)
+          count_product.value = 1 
+        } catch (err) {
+          console.error('removeFromCart error', err)
+        }
+      } else {
+        try {
+          await store.updateProductToCart(productForStore, newCount)
+          count_product.value = newCount
+        } catch (err) {
+          console.error('updateProductToCart error', err)
+        }
+      }
+    } else {
+      count_product.value = Math.max(1, count_product.value - 1)
+    }
+    return
+  }
+
+  if (typechange === 1) {
+    if (existing) {
+      const newCount = existing.count_product + 1
+      try {
+        await store.updateProductToCart(productForStore, newCount)
+        count_product.value = newCount
+      } catch (err) {
+        console.error('updateProductToCart error', err)
+      }
+    } else {
+      try {
+        await store.updateProductToCart(productForStore, 1)
+        count_product.value = 1
+      } catch (err) {
+        console.error('updateProductToCart error', err)
+      }
+    }
+    return
+  }
+}
+
+const handleAddToCard = async (product: any) => {
+  if (!product?.id) return
+
+  const id = product.id
+  const existing = (store.cartproduct || []).find((p: any) => p.id === id)
+  const productForStore = makeProductForStore(product)
+  const addCount = Math.max(1, Number(count_product.value || 1))
+
+  try {
+    if (existing) {
+      const newCount = existing.count_product + addCount
+      await store.updateProductToCart(productForStore, newCount)
+      count_product.value = newCount
+    } else {
+      await store.updateProductToCart(productForStore, addCount)
+      count_product.value = addCount
+    }
+
+    snackProduct.value = {
+      name: product?.name,
+      price: product?.price,
+      imginfo: (product?.imageInfo && (product.imageInfo[1] ?? product.imageInfo[0])) ?? product?.imginfo ?? '',
+    }
+    snackbar.value = true
+  } catch (err) {
+    console.error('addToCart/updateProductToCart error', err)
+  }
 }
 
 const handleShowMoreDiscription = () => {
@@ -256,6 +400,7 @@ const handleShowMoreDiscription = () => {
   }
 }
 </script>
+
 
 
 <style scoped>
@@ -539,7 +684,6 @@ const handleShowMoreDiscription = () => {
   transform: scale(1.1);
 }
 
-/* Mobile responsive */
 @media (max-width: 600px) {
   .carousel-nav-btn {
     width: 36px !important;
@@ -650,20 +794,20 @@ const handleShowMoreDiscription = () => {
   width: 70px;
 }
 
-.quantity-input{
+.quantity-input {
   border: none !important;
   box-shadow: none !important;
   background: transparent !important;
 }
 
-.quantity-input  {
+.quantity-input {
   text-align: center !important;
-  padding: 0 !important; /* Loại bỏ padding để căn giữa chính xác hơn */
+  padding: 0 !important;
   font-weight: 600;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  height: 100% !important; /* Đảm bảo chiều cao phù hợp */
+  height: 100% !important;
 }
 
 
@@ -681,7 +825,6 @@ const handleShowMoreDiscription = () => {
   box-shadow: 0 4px 12px rgba(243, 111, 64, 0.4) !important;
 }
 
-/* Mobile responsive */
 @media (max-width: 600px) {
   .d-flex {
     flex-direction: column;

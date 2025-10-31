@@ -6,7 +6,6 @@
     <h1 class="settings-title">Settings</h1>
     
     <div class="settings-container">
-      <!-- Profile Section -->
       <section class="settings-section">
         <h2>Profile Settings</h2>
         <div class="form-group">
@@ -23,7 +22,6 @@
         </div>
       </section>
 
-      <!-- Notification Settings -->
       <section class="settings-section">
         <h2>Notifications</h2>
         <div class="form-group">
@@ -40,7 +38,6 @@
         </div>
       </section>
 
-      <!-- Security Settings -->
       <section class="settings-section">
         <h2>Security</h2>
         <div class="form-group">
@@ -95,18 +92,10 @@ const handleImageUpload = (event: Event) => {
 
 const saveSettings = async () => {
   try {
-    // Validate passwords match
     if (security.value.newPassword !== security.value.confirmPassword) {
       alert('New passwords do not match!')
       return
     }
-
-    // Here you would typically make API calls to save the settings
-    console.log('Saving settings...', {
-      profile: profile.value,
-      notifications: notifications.value,
-      security: security.value
-    })
     
     alert('Settings saved successfully!')
   } catch (error) {
