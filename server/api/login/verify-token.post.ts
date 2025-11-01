@@ -60,7 +60,7 @@ export default defineEventHandler(async (event) => {
       select: {
         id: true,
         customernote: true,
-        address:true,
+        address: true,
       }
     })
 
@@ -71,26 +71,32 @@ export default defineEventHandler(async (event) => {
     }
   } else {
     const user_id = `user_${String(payload?.exp).split('').reverse().join('').slice(0, 5)}`
+    const userinfo = {
+      id: user_id,
+      email: `${payload?.email}`,
+      name: `${payload?.family_name} ${payload?.given_name}`,
+      role: "2",
+      avata: `${payload?.picture}`,
+      active: true,
+      status: true
+    }
+
+    const customer_info = {
+      id: generateRandomId(5),
+      id_user: user_id,
+      shippingtime: "00:00 - 00:00",
+      productcart: [],
+    }
     await db.users.create({
-      data: {
-        id: user_id,
-        email: `${payload?.email}`,
-        name: `${payload?.family_name} ${payload?.given_name}`,
-        role: "2",
-        avata: `${payload?.picture}`,
-        active: true,
-        status: true
-      }
+      data: userinfo
     })
     await db.customer.create({
-      data: {
-        id: generateRandomId(5),
-        id_user: user_id,
-        shippingtime: "00:00 - 00:00",
-        productcart: [],
-      }
+      data: customer_info
     })
 
-    return { "user_id": user_id }
+    return {
+      user: userinfo,
+      customer_info:customer_info
+    }
   }
 })

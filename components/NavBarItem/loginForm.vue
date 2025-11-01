@@ -130,7 +130,7 @@ const switchRouter = (data: any) => {
       router.push("/manage")
       break;
     case '2':
-      router.push("/user")
+      router.push("/")
       break;
   }
 }

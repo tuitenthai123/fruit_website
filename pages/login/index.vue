@@ -122,7 +122,7 @@ async function handleLogin(event: any) {
           router.push("/manage")
           break;
         case '2':
-          router.push("/user")
+          router.push("/")
           break;
       }
     }

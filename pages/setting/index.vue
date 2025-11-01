@@ -7,6 +7,7 @@
     <h1 class="settings-title">Cài đặt</h1>
 
     <div class="settings-container">
+      <!-- Thông tin cá nhân -->
       <section class="settings-section">
         <h2>Thông tin cá nhân</h2>
 
@@ -33,10 +34,11 @@
         </div>
       </section>
 
+      <!-- Đổi mật khẩu -->
       <section class="settings-section">
         <h2>Bảo mật</h2>
         <div v-if="!showPasswordChange">
-          <button class="change-pass-btn" color="#FF5B08FF" @click="showPasswordChange = true">
+          <button class="change-pass-btn" @click="showPasswordChange = true">
             Thay đổi mật khẩu
           </button>
         </div>
@@ -52,7 +54,7 @@
           </div>
 
           <div class="button-group">
-            <button class="save-button" @click="openConfirmDialog">
+            <button class="save-button" @click="confirmChangePassword">
               Xác nhận đổi mật khẩu
             </button>
             <button class="reset-button" @click="cancelChangePassword">
@@ -62,29 +64,11 @@
         </div>
       </section>
 
+      <!-- Nút lưu -->
       <div class="button-group">
         <button @click="saveProfile" class="save-button">Lưu thay đổi hồ sơ</button>
       </div>
     </div>
-
-    <v-dialog v-model="dialogConfirm" max-width="400px">
-      <v-card>
-        <v-card-title class="text-h6 font-weight-bold">Xác thực đổi mật khẩu</v-card-title>
-        <v-card-text>
-          <p>Vui lòng nhập mật khẩu hiện tại để xác nhận thay đổi:</p>
-          <input
-            v-model="security.currentPassword"
-            type="password"
-            placeholder="Nhập mật khẩu hiện tại"
-            class="input-dialog"
-          />
-        </v-card-text>
-        <v-card-actions class="justify-end">
-          <v-btn text @click="dialogConfirm = false">Hủy</v-btn>
-          <v-btn color="primary" @click="confirmChangePassword">Xác nhận</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </div>
 </template>
 
@@ -96,7 +80,6 @@ const router = useRouter()
 const store: any = useFruitStore()
 
 const showPasswordChange = ref(false)
-const dialogConfirm = ref(false)
 
 const profile = ref({
   fullName: '',
@@ -106,7 +89,6 @@ const profile = ref({
 })
 
 const security = ref({
-  currentPassword: '',
   newPassword: '',
   confirmPassword: ''
 })
@@ -120,7 +102,7 @@ onMounted(() => {
   }
 })
 
-const saveProfile = () => {
+const saveProfile = async () => {
   store.userinfo = {
     ...store.userinfo,
     name: profile.value.fullName,
@@ -128,34 +110,34 @@ const saveProfile = () => {
     avata: profile.value.profilePicture,
     phonenumber: profile.value.phonenumber
   }
+
+  const user_info_setting = {
+    id: store.userinfo.id,
+    name: profile.value.fullName,
+    email: profile.value.email,
+    phonenumber: profile.value.phonenumber
+  }
+  const abc = await store.userUpdateInfomation(user_info_setting)
+  console.log(abc)
   alert('Cập nhật hồ sơ thành công!')
 }
 
-const openConfirmDialog = () => {
+const confirmChangePassword = async () => {
   if (security.value.newPassword !== security.value.confirmPassword) {
     alert('Mật khẩu mới không khớp!')
     return
   }
-  dialogConfirm.value = true
-}
 
-const confirmChangePassword = async () => {
-  if (security.value.currentPassword !== store.userinfo.password) {
-    alert('Mật khẩu hiện tại không đúng!')
-    return
-  }
-
-  store.userinfo.password = security.value.newPassword
+  await store.userSettingChangePassword(security.value.newPassword, store.userinfo.id)
   alert('Đổi mật khẩu thành công!')
 
-  dialogConfirm.value = false
   showPasswordChange.value = false
-  security.value = { currentPassword: '', newPassword: '', confirmPassword: '' }
+  security.value = { newPassword: '', confirmPassword: '' }
 }
 
 const cancelChangePassword = () => {
   showPasswordChange.value = false
-  security.value = { currentPassword: '', newPassword: '', confirmPassword: '' }
+  security.value = { newPassword: '', confirmPassword: '' }
 }
 
 const goBack = () => router.push('/')
@@ -167,47 +149,56 @@ const goBack = () => router.push('/')
   margin: 0 auto;
   padding: 20px;
 }
+
 .settings-title {
   font-size: 2em;
   margin-bottom: 30px;
   color: #333;
 }
+
 .settings-container {
   background: white;
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
 .settings-section {
   margin-bottom: 30px;
   padding-bottom: 20px;
   border-bottom: 1px solid #eee;
 }
+
 .form-group {
   margin-bottom: 15px;
 }
+
 .form-group label {
   display: block;
   margin-bottom: 5px;
   color: #666;
 }
+
 .form-group input {
   width: 100%;
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
+
 .avatar-preview img {
   width: 80px;
   height: 80px;
   border-radius: 50%;
   object-fit: cover;
 }
+
 .button-group {
   display: flex;
   gap: 10px;
   margin-top: 20px;
 }
+
 .save-button,
 .reset-button,
 .change-pass-btn {
@@ -216,27 +207,34 @@ const goBack = () => router.push('/')
   border-radius: 4px;
   cursor: pointer;
 }
+
 .save-button {
   background-color: #4CAF50;
   color: white;
 }
+
 .reset-button {
   background-color: #f44336;
   color: white;
 }
+
 .change-pass-btn {
   background-color: #1976d2;
   color: white;
 }
+
 .save-button:hover {
   background-color: #45a049;
 }
+
 .reset-button:hover {
   background-color: #da190b;
 }
+
 .change-pass-btn:hover {
   background-color: #1256a0;
 }
+
 .back-button {
   display: flex;
   align-items: center;
@@ -249,15 +247,9 @@ const goBack = () => router.push('/')
   font-size: large;
   font-weight: 800;
 }
+
 .back-arrow {
   font-size: 30px;
   font-weight: 800;
-}
-.input-dialog {
-  width: 100%;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  margin-top: 8px;
 }
 </style>

@@ -33,6 +33,28 @@ export const useFruitStore = defineStore('websiteStore', {
   },
 
   actions: {
+
+    async userSettingChangePassword(password: any,id:any) {
+      const response_userinfo = await $fetch(`/api/setting/update_user_password`, {
+        method: "POST",
+        body: {
+          password,
+          id
+        },
+      })
+      return response_userinfo
+    },
+
+    async userUpdateInfomation(user_info: any) {
+      const response_userinfo = await $fetch(`/api/setting/update_user_info`, {
+        method: "POST",
+        body: {
+          user_info
+        },
+      })
+      return response_userinfo
+    },
+
     _getCache(key: string) {
       const sc: any = (this as any).searchCache
       if (!sc) return undefined
