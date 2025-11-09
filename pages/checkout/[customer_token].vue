@@ -473,4 +473,88 @@ h3 {
   font-size: 18px;
   line-height: 1;
 }
+
+@media (max-width: 900px) {
+  .checkout-wrapper {
+    flex-direction: column;
+    padding: 14px;
+    gap: 20px;
+  }
+
+  .checkout-left,
+  .checkout-right {
+    flex: unset;
+    width: 100%;
+    border: none;
+    padding: 0;
+  }
+
+  .checkout-right {
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+  }
+
+  .btn-back {
+    position: relative;
+    left: 0;
+    top: 0;
+    margin-bottom: 12px;
+  }
+
+  .form-row.grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .radio-group {
+    flex-direction: column;
+    font-size: 14px;
+  }
+
+  .cart-item {
+    flex-wrap: wrap;
+  }
+
+  .cart-item img {
+    width: 56px;
+    height: 56px;
+  }
+
+  .discount {
+    flex-direction: column;
+  }
+
+  .discount input,
+  .discount button {
+    width: 100%;
+  }
+
+  .btn-submit {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  .checkout-wrapper {
+    font-size: 13px;
+  }
+
+  h2, h3 {
+    font-size: 15px;
+  }
+
+  .btn-back {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+
+  .radio-group label {
+    padding: 8px;
+  }
+
+  .summary .total {
+    font-size: 15px;
+  }
+}
+
 </style>
