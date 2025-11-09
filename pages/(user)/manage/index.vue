@@ -334,6 +334,7 @@ function goHome() {
 }
 function logout() {
   snackbar.value = { show: true, message: 'Đã đăng xuất thành công', color: 'error' }
+  await store.logOut()
   setTimeout(() => router.push('/login'), 800)
 }
 </script>
